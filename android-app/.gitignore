@@ -1,0 +1,38 @@
+# Archivos generados por Gradle y Android Studio
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+*/build/
+
+# APK / AAB
+*.apk
+*.ap_
+*.aab
+*.dex
+
+# Archivos de ofimática o externos (Word, Excel, PowerPoint, PDFs temporales)
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+~$*
+*.csv
+
+# Node / Web (en caso de copiarse por error)
+node_modules/
+package.json
+package-lock.json
+
+# CodeGuardian Safe Exclusions (Zero-Footprint in production)
+.codeguardian/
+.guardian*
+analysis_report.json
