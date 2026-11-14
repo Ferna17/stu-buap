@@ -1,5 +1,3 @@
-// tests/auth/registerValidator.test.js
-
 const { validarRegistro } = require('../../src/auth/registerValidator');
 
 const padronExistente = [
@@ -12,11 +10,13 @@ describe('Módulo de Registro de Nuevo Estudiante STU (HU-01.1 - BICEP/CORRECT)'
     const res = validarRegistro('fernando.hernandez@alumno.buap.mx', '202112345', '170301', padronExistente);
     expect(res.ok).toBe(true);
     expect(res.usuario.saldoPasajes).toBe(0);
+    expect(res.usuario.estado).toBe('ACTIVO');
   });
 
   test('PR2: Registrar exitosamente a un alumno nuevo con dominio @correo.buap.mx', () => {
     const res = validarRegistro('fernando.hernandez@correo.buap.mx', '202154321', '170301', padronExistente);
     expect(res.ok).toBe(true);
+    expect(res.usuario.saldoPasajes).toBe(0);
     expect(res.usuario.estado).toBe('ACTIVO');
   });
 
@@ -81,6 +81,71 @@ describe('Módulo de Registro de Nuevo Estudiante STU (HU-01.1 - BICEP/CORRECT)'
     const res = validarRegistro('', '', '', padronExistente);
     expect(res.ok).toBe(false);
     expect(res.campoError).toBe('todos');
+  });
+
+  test('PR13: Registrar exitosamente con Nombre(s) y Apellidos normalizados en el perfil', () => {
+    const res = validarRegistro(
+      'fernando.hernandez@alumno.buap.mx',
+      '202112345',
+      '170301',
+      padronExistente,
+      '  Fernando Jesús ',
+      ' Hernández   Gorgua '
+    );
+    expect(res.ok).toBe(true);
+    expect(res.usuario.nombre).toBe('Fernando Jesús Hernández Gorgua');
+    expect(res.usuario.saldoPasajes).toBe(0);
+    expect(res.usuario.estado).toBe('ACTIVO');
+  });
+
+  test('PR14: Rechazar registro cuando Nombre(s) está vacío', () => {
+    const res = validarRegistro(
+      'fernando.hernandez@alumno.buap.mx',
+      '202112345',
+      '170301',
+      padronExistente,
+      '',
+      'Hernández Gorgua'
+    );
+    expect(res.ok).toBe(false);
+    expect(res.campoError).toBe('nombres');
+  });
+
+  test('PR15: Rechazar registro cuando Apellidos está vacío', () => {
+    const res = validarRegistro(
+      'fernando.hernandez@alumno.buap.mx',
+      '202112345',
+      '170301',
+      padronExistente,
+      'Fernando Jesús',
+      '   '
+    );
+    expect(res.ok).toBe(false);
+    expect(res.campoError).toBe('apellidos');
+  });
+
+  test('PR16: Rechazar registro cuando Nombre(s) o Apellidos contienen dígitos o símbolos', () => {
+    const resNombre = validarRegistro(
+      'fernando.hernandez@alumno.buap.mx',
+      '202112345',
+      '170301',
+      padronExistente,
+      'Fernando123',
+      'Hernández'
+    );
+    expect(resNombre.ok).toBe(false);
+    expect(resNombre.campoError).toBe('nombres');
+
+    const resApellido = validarRegistro(
+      'fernando.hernandez@alumno.buap.mx',
+      '202112345',
+      '170301',
+      padronExistente,
+      'Fernando',
+      'Hernández@99'
+    );
+    expect(resApellido.ok).toBe(false);
+    expect(resApellido.campoError).toBe('apellidos');
   });
 
 });

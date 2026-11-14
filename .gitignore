@@ -1,1 +1,13 @@
 node_modules
+
+# CodeGuardian Safe Exclusions (Zero-Footprint in production)
+.codeguardian/
+.guardian*
+analysis_report.json
+code_guardian_*.py
+guardian_ai_bridge.py
+openutau_bridge.py
+code_guardian_viewer.html
+vocal_music_studio.html
+Abrir_Estudio_Vocal.bat
+CodeGuardian*.exe
