@@ -88,9 +88,10 @@ Reporte esperado:
 Suites de Prueba: 2 aprobadas, 2 total | Pruebas: 35 aprobadas, 35 total
 ```
 
-### JavaScript / Node.js (Jest — 56 pruebas: 19 PF + 16 PR + 21 Adversariales)
+### JavaScript / Node.js (Rama `tests` — Jest: 56 pruebas: 19 PF + 16 PR + 21 Adversariales)
 ```powershell
 cd "d:\Ingieneria de software\Ingieneria de software ii\stu-buap"
+git switch tests
 npm test
 ```
 

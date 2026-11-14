@@ -259,24 +259,3 @@ fun VistaPreviaPantallaIngresoSinRegistro() {
     }
 }
 
-@Preview(name = "Pantalla 1 - Ingreso STU (Retorno con Registro Exitoso Flujo B)", showBackground = true, showSystemUi = true)
-@Composable
-fun VistaPreviaPantallaIngresoRegistroExitoso() {
-    TemaStu {
-        val repo = RepositorioUsuarioMemoria()
-        val viewModel = IngresoViewModel(repo)
-        viewModel.aplicarRegistroExitoso(
-            UsuarioSTU(
-                correo = "nuevo.alumno@alumno.buap.mx",
-                matricula = "202512345",
-                contrasena = "101006",
-                nombre = "Alumno BUAP (202512345)"
-            )
-        )
-        PantallaIngreso(
-            viewModel = viewModel,
-            onLoginExitoso = {},
-            onIrARegistro = {}
-        )
-    }
-}
