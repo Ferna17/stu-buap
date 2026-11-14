@@ -13,7 +13,7 @@ import mx.buap.stu.data.UsuarioSTU
  */
 object ValidadorLogin {
 
-    val DOMINIOS_BUAP = listOf("alumno.buap.mx", "alm.buap.mx", "correo.buap.mx")
+    val DOMINIOS_BUAP = ValidadorCredenciales.DOMINIOS_BUAP
 
     val PADRON_DEFECTO = listOf(
         UsuarioSTU("Javier.sangines@alumno.buap.mx", "202268046", "290504"),
@@ -26,105 +26,29 @@ object ValidadorLogin {
         contrasena: String,
         baseDeDatos: List<UsuarioSTU> = PADRON_DEFECTO
     ): ResultadoLogin {
-        // PF19: Ausencia de datos obligatorios
-        if (correo.isEmpty() || matricula.isEmpty() || contrasena.isEmpty()) {
+        val formato = ValidadorCredenciales.validarFormato(
+            correo = correo,
+            matricula = matricula,
+            contrasena = contrasena,
+            mensajeCamposVacios = "Completa tu correo, matrícula y contraseña para entrar"
+        )
+        if (formato is ResultadoFormato.Invalido) {
             return ResultadoLogin(
                 ok = false,
-                campoError = "todos",
-                mensaje = "Completa tu correo, matrícula y contraseña para entrar"
+                campoError = formato.campoError,
+                mensaje = formato.mensaje
             )
         }
 
-        // PF12: Formato de correo (debe incluir @)
-        if (!correo.contains("@")) {
-            return ResultadoLogin(
-                ok = false,
-                campoError = "email",
-                mensaje = "Formato inválido de correo electrónico"
-            )
-        }
-
-        val partes = correo.split("@")
-        if (partes.size != 2) {
-            return ResultadoLogin(
-                ok = false,
-                campoError = "email",
-                mensaje = "Formato de correo no permitido"
-            )
-        }
-
-        val (usuario, dominio) = partes
-
-        // PF3: Límite inválido inferior (0 caracteres antes del @)
-        if (usuario.isEmpty()) {
-            return ResultadoLogin(
-                ok = false,
-                campoError = "email",
-                mensaje = "Ingresa un usuario válido antes del @"
-            )
-        }
-
-        // PF4 (1 caract.), PF5 (30 caract.), PF6 (>30 caract.)
-        if (usuario.length > 30) {
-            return ResultadoLogin(
-                ok = false,
-                campoError = "email",
-                mensaje = "El correo excede el máximo de 30 caracteres antes del @"
-            )
-        }
-
-        // PF1, PF2, PF11: Dominios institucionales BUAP permitidos
-        if (!DOMINIOS_BUAP.contains(dominio.lowercase())) {
-            return ResultadoLogin(
-                ok = false,
-                campoError = "email",
-                mensaje = "Usa un dominio institucional BUAP válido"
-            )
-        }
-
-        // PF13: La matrícula solo admite dígitos numéricos
-        if (!matricula.matches(Regex("^\\d+$"))) {
-            return ResultadoLogin(
-                ok = false,
-                campoError = "matricula",
-                mensaje = "La matrícula solo admite dígitos numéricos"
-            )
-        }
-
-        // PF7 (8 dígitos), PF8 (10 dígitos): Exactamente 9 dígitos
-        if (matricula.length != 9) {
-            return ResultadoLogin(
-                ok = false,
-                campoError = "matricula",
-                mensaje = "La matrícula debe tener exactamente 9 dígitos"
-            )
-        }
-
-        // PF9 (5 dígitos), PF10 (7 dígitos): Contraseña de 6 dígitos (DDMMAA)
-        if (!contrasena.matches(Regex("^\\d{6}$"))) {
-            return ResultadoLogin(
-                ok = false,
-                campoError = "password",
-                mensaje = "La contraseña debe contener 6 dígitos (DDMMAA)"
-            )
-        }
-
-        // PF14: Validación de fecha válida (día 01-31, mes 01-12)
-        val dia = contrasena.substring(0, 2).toInt()
-        val mes = contrasena.substring(2, 4).toInt()
-        if (dia < 1 || dia > 31 || mes < 1 || mes > 12) {
-            return ResultadoLogin(
-                ok = false,
-                campoError = "password",
-                mensaje = "La contraseña no corresponde a una fecha válida"
-            )
-        }
+        val credenciales = (formato as ResultadoFormato.Valido).credenciales
 
         // Búsqueda combinada en el padrón (prioriza coincidencia exacta matrícula + correo)
         val usuarioEncontrado = baseDeDatos.find {
-            it.matricula == matricula && it.correo.equals(correo, ignoreCase = true)
+            it.matricula.trim() == credenciales.matricula &&
+                it.correo.trim().equals(credenciales.correo, ignoreCase = true)
         } ?: baseDeDatos.find {
-            it.matricula == matricula || it.correo.equals(correo, ignoreCase = true)
+            it.matricula.trim() == credenciales.matricula ||
+                it.correo.trim().equals(credenciales.correo, ignoreCase = true)
         }
 
         // PF18: Usuario sin registro previo
@@ -138,7 +62,7 @@ object ValidadorLogin {
         }
 
         // PF17: El correo no coincide con la matrícula registrada
-        if (!usuarioEncontrado.correo.equals(correo, ignoreCase = true)) {
+        if (!usuarioEncontrado.correo.trim().equals(credenciales.correo, ignoreCase = true)) {
             return ResultadoLogin(
                 ok = false,
                 campoError = "email",
@@ -147,7 +71,7 @@ object ValidadorLogin {
         }
 
         // PF16: La matrícula no coincide con el correo registrado
-        if (usuarioEncontrado.matricula != matricula) {
+        if (usuarioEncontrado.matricula.trim() != credenciales.matricula) {
             return ResultadoLogin(
                 ok = false,
                 campoError = "matricula",
@@ -156,7 +80,7 @@ object ValidadorLogin {
         }
 
         // PF15: Contraseña incorrecta
-        if (usuarioEncontrado.contrasena != contrasena) {
+        if (usuarioEncontrado.contrasena.trim() != credenciales.contrasena) {
             return ResultadoLogin(
                 ok = false,
                 campoError = "password",

@@ -1,10 +1,8 @@
 package mx.buap.stu.ui.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -12,10 +10,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -34,33 +32,28 @@ import mx.buap.stu.ui.viewmodels.IngresoViewModel
 @Composable
 fun PantallaIngreso(
     viewModel: IngresoViewModel,
-    onLoginExitoso: (UsuarioSTU) -> Unit
+    onLoginExitoso: (UsuarioSTU) -> Unit,
+    onIrARegistro: (precargar: Boolean) -> Unit = {}
 ) {
     val resultado = viewModel.resultado
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .safeDrawingPadding()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 28.dp, vertical = 36.dp),
+            .padding(horizontal = 28.dp, vertical = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Logo circular azul "STU" fiel al diseño de Figma
-        Box(
+        Column(
             modifier = Modifier
-                .size(72.dp)
-                .clip(CircleShape)
-                .background(AzulStu),
-            contentAlignment = Alignment.Center
+                .widthIn(max = 480.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "STU",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        // Logo circular azul "STU" fiel al diseño de Figma
+        LogoCircularStu()
 
         Spacer(modifier = Modifier.height(36.dp))
 
@@ -123,34 +116,43 @@ fun PantallaIngreso(
             )
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Acceso directo a Pantalla de Registro (HU-01.1)
+        TextButton(
+            onClick = { onIrARegistro(false) },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "¿No estás registrado? Regístrate",
+                color = AzulOscuroStu,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
         // Mensaje de retroalimentación por campo y botón de Registro (PF18)
         resultado?.let { respuesta ->
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(if (respuesta.ok) FondoExito else FondoError)
-                    .padding(12.dp)
-            ) {
-                Text(
-                    text = respuesta.mensaje,
-                    color = if (respuesta.ok) TextoExito else TextoError,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
-                )
+            Spacer(modifier = Modifier.height(12.dp))
+            val mensajeVisible = if (respuesta.puedeRegistrarse) {
+                "${respuesta.mensaje}. No estás registrado, debes registrarte para acceder al STU."
+            } else {
+                respuesta.mensaje
             }
+            BannerResultadoStu(
+                esExito = respuesta.ok,
+                mensaje = mensajeVisible
+            )
 
             if (respuesta.puedeRegistrarse) {
                 Spacer(modifier = Modifier.height(10.dp))
                 OutlinedButton(
-                    onClick = {
-                        viewModel.registrarNuevoUsuario(onLoginExitoso)
-                    },
+                    onClick = { onIrARegistro(true) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(44.dp),
-                    shape = RoundedCornerShape(50)
+                    shape = RoundedCornerShape(50),
+                    border = BorderStroke(1.5.dp, AzulStu)
                 ) {
                     Text(
                         text = "Registrarse en el padrón STU",
@@ -164,36 +166,11 @@ fun PantallaIngreso(
         Spacer(modifier = Modifier.height(24.dp))
 
         // Panel compacto de Métricas No Funcionales en Vivo
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xFFF8FAFC))
-                .border(1.dp, GrisBorde, RoundedCornerShape(8.dp))
-                .padding(12.dp)
-        ) {
-            Text(
-                text = "Métricas en vivo (Evidencia No Funcional):",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF475569)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "• Tiempo de respuesta del validador: ${viewModel.tiempoRespuestaMs} ms",
-                fontSize = 11.sp,
-                color = Color(0xFF475569)
-            )
-            Text(
-                text = "• Tiempo de captura del usuario: ${viewModel.tiempoCapturaSeg} s",
-                fontSize = 11.sp,
-                color = Color(0xFF475569)
-            )
-            Text(
-                text = "• Errores de captura detectados: ${viewModel.erroresDetectados}",
-                fontSize = 11.sp,
-                color = Color(0xFF475569)
-            )
+        PanelMetricasStu(
+            tiempoRespuestaMs = viewModel.tiempoRespuestaMs,
+            tiempoCapturaSeg = viewModel.tiempoCapturaSeg,
+            erroresDetectados = viewModel.erroresDetectados
+        )
         }
     }
 }
@@ -207,6 +184,7 @@ fun CampoFormularioStu(
     esError: Boolean,
     tipoTeclado: KeyboardType,
     esContrasena: Boolean = false,
+    capitalizacion: KeyboardCapitalization = KeyboardCapitalization.None,
     alEnfocar: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -233,7 +211,10 @@ fun CampoFormularioStu(
             singleLine = true,
             isError = esError,
             visualTransformation = if (esContrasena) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions(keyboardType = tipoTeclado),
+            keyboardOptions = KeyboardOptions(
+                capitalization = capitalizacion,
+                keyboardType = tipoTeclado
+            ),
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = AzulStu,
@@ -246,7 +227,7 @@ fun CampoFormularioStu(
     }
 }
 
-@Preview(name = "Pantalla 1 - Ingreso STU", showBackground = true, showSystemUi = true)
+@Preview(name = "Pantalla 1 - Ingreso STU (Formulario Limpio)", showBackground = true, showSystemUi = true)
 @Composable
 fun VistaPreviaPantallaIngreso() {
     TemaStu {
@@ -254,7 +235,48 @@ fun VistaPreviaPantallaIngreso() {
         val viewModel = IngresoViewModel(repo)
         PantallaIngreso(
             viewModel = viewModel,
-            onLoginExitoso = {}
+            onLoginExitoso = {},
+            onIrARegistro = {}
+        )
+    }
+}
+
+@Preview(name = "Pantalla 1 - Ingreso STU (Aviso Sin Registro Previo PF18)", showBackground = true, showSystemUi = true)
+@Composable
+fun VistaPreviaPantallaIngresoSinRegistro() {
+    TemaStu {
+        val repo = RepositorioUsuarioMemoria()
+        val viewModel = IngresoViewModel(repo)
+        viewModel.actualizarCorreo("nuevo.alumno@alumno.buap.mx")
+        viewModel.actualizarMatricula("202512345")
+        viewModel.actualizarContrasena("101006")
+        viewModel.ejecutarLogin {} // Genera el estado de Sin registro previo
+        PantallaIngreso(
+            viewModel = viewModel,
+            onLoginExitoso = {},
+            onIrARegistro = {}
+        )
+    }
+}
+
+@Preview(name = "Pantalla 1 - Ingreso STU (Retorno con Registro Exitoso Flujo B)", showBackground = true, showSystemUi = true)
+@Composable
+fun VistaPreviaPantallaIngresoRegistroExitoso() {
+    TemaStu {
+        val repo = RepositorioUsuarioMemoria()
+        val viewModel = IngresoViewModel(repo)
+        viewModel.aplicarRegistroExitoso(
+            UsuarioSTU(
+                correo = "nuevo.alumno@alumno.buap.mx",
+                matricula = "202512345",
+                contrasena = "101006",
+                nombre = "Alumno BUAP (202512345)"
+            )
+        )
+        PantallaIngreso(
+            viewModel = viewModel,
+            onLoginExitoso = {},
+            onIrARegistro = {}
         )
     }
 }

@@ -34,7 +34,7 @@ android {
 
     testOptions {
         unitTests.all { tareaPrueba ->
-            val resultadosOrdenados = mutableListOf<Pair<Int, String>>()
+            val resultadosPorClase = linkedMapOf<String, MutableList<Pair<Int, String>>>()
             tareaPrueba.addTestListener(object : org.gradle.api.tasks.testing.TestListener {
                 override fun beforeSuite(suite: org.gradle.api.tasks.testing.TestDescriptor) {}
                 override fun beforeTest(descriptorPrueba: org.gradle.api.tasks.testing.TestDescriptor) {}
@@ -43,20 +43,30 @@ android {
                     resultado: org.gradle.api.tasks.testing.TestResult
                 ) {
                     val duracionMs = (resultado.endTime - resultado.startTime).coerceAtLeast(1)
-                    val numeroPF = Regex("^PF(\\d+)").find(descriptorPrueba.name)?.groupValues?.get(1)?.toIntOrNull() ?: 99
+                    val numeroCaso = Regex("^P[FR](\\d+)").find(descriptorPrueba.name)?.groupValues?.get(1)?.toIntOrNull() ?: 99
                     val linea = "  √ ${descriptorPrueba.name} (${duracionMs} ms)"
-                    resultadosOrdenados.add(numeroPF to linea)
+                    val clase = descriptorPrueba.className ?: "SuiteDesconocida"
+                    resultadosPorClase.getOrPut(clase) { mutableListOf() }.add(numeroCaso to linea)
                 }
                 override fun afterSuite(
                     suite: org.gradle.api.tasks.testing.TestDescriptor,
                     resultado: org.gradle.api.tasks.testing.TestResult
                 ) {
+                    val clase = suite.className
+                    if (clase != null && resultadosPorClase.containsKey(clase)) {
+                        val rutaArchivo = "app/src/test/java/${clase.replace('.', '/')}.kt"
+                        val titulo = if (clase.endsWith("ValidadorRegistroTest")) {
+                            "Módulo de Registro de Nuevo Estudiante STU Android (HU-01.1 - BICEP/CORRECT)"
+                        } else {
+                            "Módulo de Inicio de Sesión STU Android (HU-01 - BICEP/CORRECT)"
+                        }
+                        println("\n APROBADO  $rutaArchivo")
+                        println("  $titulo")
+                        resultadosPorClase[clase].orEmpty().sortedBy { it.first }.forEach { println(it.second) }
+                    }
                     if (suite.parent == null) {
                         val totalSegundos = (resultado.endTime - resultado.startTime) / 1000.0
-                        println("\n APROBADO  app/src/test/java/mx/buap/stu/auth/ValidadorLoginTest.kt")
-                        println("  Módulo de Inicio de Sesión STU Android (HU-01 - BICEP/CORRECT)")
-                        resultadosOrdenados.sortedBy { it.first }.forEach { println(it.second) }
-                        println("\nSuites de Prueba: 1 aprobada, 1 total | Pruebas: ${resultado.successfulTestCount} aprobadas, ${resultado.testCount} total | Tiempo: ${totalSegundos} s\n")
+                        println("\nSuites de Prueba: ${resultadosPorClase.size} aprobadas, ${resultadosPorClase.size} total | Pruebas: ${resultado.successfulTestCount} aprobadas, ${resultado.testCount} total | Tiempo: ${totalSegundos} s\n")
                     }
                 }
             })

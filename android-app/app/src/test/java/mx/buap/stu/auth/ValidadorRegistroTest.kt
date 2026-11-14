@@ -175,4 +175,73 @@ class ValidadorRegistroTest {
         assertFalse(resultado.ok)
         assertEquals("todos", resultado.campoError)
     }
+
+    @Test
+    fun `PR13 - Registrar exitosamente capturando Nombre(s) y Apellidos para reflejarlos en el perfil`() {
+        val resultado = ValidadorRegistro.validarRegistro(
+            correo = "fernando.hernandez@alumno.buap.mx",
+            matricula = "202112345",
+            contrasena = "170301",
+            baseDeDatos = padronExistente,
+            nombres = "  Fernando Jesús ",
+            apellidos = " Hernández   Gorgua "
+        )
+        assertTrue(resultado.ok)
+        assertEquals("Fernando Jesús Hernández Gorgua", resultado.usuario?.nombre)
+        assertEquals(0, resultado.usuario?.pasajesDisponibles)
+        assertEquals("ACTIVO", resultado.usuario?.estado)
+    }
+
+    @Test
+    fun `PR14 - Rechazar registro cuando Nombre(s) esta vacio en formulario completo`() {
+        val resultado = ValidadorRegistro.validarRegistro(
+            correo = "fernando.hernandez@alumno.buap.mx",
+            matricula = "202112345",
+            contrasena = "170301",
+            baseDeDatos = padronExistente,
+            nombres = "",
+            apellidos = "Hernández Gorgua"
+        )
+        assertFalse(resultado.ok)
+        assertEquals("nombres", resultado.campoError)
+    }
+
+    @Test
+    fun `PR15 - Rechazar registro cuando Apellidos esta vacio en formulario completo`() {
+        val resultado = ValidadorRegistro.validarRegistro(
+            correo = "fernando.hernandez@alumno.buap.mx",
+            matricula = "202112345",
+            contrasena = "170301",
+            baseDeDatos = padronExistente,
+            nombres = "Fernando Jesús",
+            apellidos = "   "
+        )
+        assertFalse(resultado.ok)
+        assertEquals("apellidos", resultado.campoError)
+    }
+
+    @Test
+    fun `PR16 - Rechazar registro cuando Nombre(s) o Apellidos contienen numeros o simbolos`() {
+        val resultadoNombreInvalido = ValidadorRegistro.validarRegistro(
+            correo = "fernando.hernandez@alumno.buap.mx",
+            matricula = "202112345",
+            contrasena = "170301",
+            baseDeDatos = padronExistente,
+            nombres = "Fernando123",
+            apellidos = "Hernández"
+        )
+        assertFalse(resultadoNombreInvalido.ok)
+        assertEquals("nombres", resultadoNombreInvalido.campoError)
+
+        val resultadoApellidoInvalido = ValidadorRegistro.validarRegistro(
+            correo = "fernando.hernandez@alumno.buap.mx",
+            matricula = "202112345",
+            contrasena = "170301",
+            baseDeDatos = padronExistente,
+            nombres = "Fernando",
+            apellidos = "Hernández@99"
+        )
+        assertFalse(resultadoApellidoInvalido.ok)
+        assertEquals("apellidos", resultadoApellidoInvalido.campoError)
+    }
 }

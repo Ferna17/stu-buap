@@ -1,7 +1,6 @@
 package mx.buap.stu.ui.viewmodels
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -10,7 +9,6 @@ import mx.buap.stu.auth.ValidadorLogin
 import mx.buap.stu.data.RepositorioUsuario
 import mx.buap.stu.data.ResultadoLogin
 import mx.buap.stu.data.UsuarioSTU
-import java.util.Locale
 
 /**
  * ViewModel para la pantalla de Ingreso (Login HU-01).
@@ -32,22 +30,19 @@ class IngresoViewModel(
     var resultado by mutableStateOf<ResultadoLogin?>(null)
         private set
 
-    // Métricas no funcionales en vivo
-    var tiempoRespuestaMs by mutableStateOf("0.00")
-        private set
+    private val metricas = MedidorMetricasCaptura()
 
-    var tiempoCapturaSeg by mutableStateOf("0.0")
-        private set
+    val tiempoRespuestaMs: String
+        get() = metricas.tiempoRespuestaMs
 
-    var erroresDetectados by mutableIntStateOf(0)
-        private set
+    val tiempoCapturaSeg: String
+        get() = metricas.tiempoCapturaSeg
 
-    private var inicioCapturaNs: Long? = null
+    val erroresDetectados: Int
+        get() = metricas.erroresDetectados
 
     fun iniciarTemporizador() {
-        if (inicioCapturaNs == null) {
-            inicioCapturaNs = System.nanoTime()
-        }
+        metricas.iniciarTemporizador()
     }
 
     fun actualizarCorreo(nuevo: String) {
@@ -65,42 +60,43 @@ class IngresoViewModel(
         contrasena = nueva
     }
 
-    fun ejecutarLogin(onLoginExitoso: (UsuarioSTU) -> Unit) {
-        val t0 = System.nanoTime()
-        val respuesta = ValidadorLogin.validarLogin(
-            correo = correo.trim(),
-            matricula = matricula.trim(),
-            contrasena = contrasena.trim(),
-            baseDeDatos = repositorio.obtenerPadron()
-        )
-        val t1 = System.nanoTime()
-
-        val duracionMs = (t1 - t0) / 1_000_000.0
-        tiempoRespuestaMs = String.format(Locale.US, "%.2f", duracionMs)
-
-        inicioCapturaNs?.let { inicio ->
-            val segundos = (t1 - inicio) / 1_000_000_000.0
-            tiempoCapturaSeg = String.format(Locale.US, "%.1f", segundos)
+    /**
+     * Limpia mensajes o errores residuales de intentos previos de inicio de sesión.
+     */
+    fun limpiarErrorPrevio() {
+        if (resultado?.ok == false) {
+            resultado = null
         }
-        inicioCapturaNs = null
+    }
+
+    /**
+     * Precarga los datos del nuevo estudiante registrado y activa el aviso de éxito (Flujo B).
+     */
+    fun aplicarRegistroExitoso(usuario: UsuarioSTU) {
+        correo = usuario.correo
+        matricula = usuario.matricula
+        contrasena = usuario.contrasena
+        resultado = ResultadoLogin(
+            ok = true,
+            mensaje = "¡Registro exitoso! Ya puedes ingresar al STU con tu cuenta.",
+            usuario = usuario
+        )
+    }
+
+    fun ejecutarLogin(onLoginExitoso: (UsuarioSTU) -> Unit) {
+        val respuesta = metricas.medir(esExitoso = { it.ok && it.usuario != null }) {
+            ValidadorLogin.validarLogin(
+                correo = correo.trim(),
+                matricula = matricula.trim(),
+                contrasena = contrasena.trim(),
+                baseDeDatos = repositorio.obtenerPadron()
+            )
+        }
         resultado = respuesta
 
         if (respuesta.ok && respuesta.usuario != null) {
             onLoginExitoso(respuesta.usuario)
-        } else {
-            erroresDetectados++
         }
-    }
-
-    fun registrarNuevoUsuario(onRegistroExitoso: (UsuarioSTU) -> Unit) {
-        val nuevo = UsuarioSTU(
-            correo = correo.trim(),
-            matricula = matricula.trim(),
-            contrasena = contrasena.trim(),
-            nombre = "Alumno BUAP (${matricula.trim()})"
-        )
-        repositorio.registrarUsuario(nuevo)
-        onRegistroExitoso(nuevo)
     }
 
     class Factory(private val repositorio: RepositorioUsuario) : ViewModelProvider.Factory {

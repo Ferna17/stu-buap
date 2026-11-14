@@ -18,6 +18,12 @@ class RegistroViewModel(
     private val repositorio: RepositorioUsuario
 ) : ViewModel() {
 
+    var nombres by mutableStateOf("")
+        private set
+
+    var apellidos by mutableStateOf("")
+        private set
+
     var correo by mutableStateOf("")
         private set
 
@@ -56,6 +62,16 @@ class RegistroViewModel(
         precargaAplicada = true
     }
 
+    fun actualizarNombres(nuevo: String) {
+        iniciarTemporizador()
+        nombres = nuevo
+    }
+
+    fun actualizarApellidos(nuevo: String) {
+        iniciarTemporizador()
+        apellidos = nuevo
+    }
+
     fun actualizarCorreo(nuevo: String) {
         iniciarTemporizador()
         correo = nuevo
@@ -77,7 +93,9 @@ class RegistroViewModel(
                 correo = correo,
                 matricula = matricula,
                 contrasena = contrasena,
-                baseDeDatos = repositorio.obtenerPadron()
+                baseDeDatos = repositorio.obtenerPadron(),
+                nombres = nombres,
+                apellidos = apellidos
             )
         }
         resultado = respuesta

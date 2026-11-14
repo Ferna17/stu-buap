@@ -18,6 +18,14 @@ internal sealed class ResultadoFormato {
 }
 
 /**
+ * Resultado interno de validación para campos de texto alfabético (nombres y apellidos).
+ */
+internal sealed class ResultadoCampoTexto {
+    data class Valido(val textoNormalizado: String) : ResultadoCampoTexto()
+    data class Invalido(val campoError: String, val mensaje: String) : ResultadoCampoTexto()
+}
+
+/**
  * Reglas comunes de formato y sanitización BICEP/CORRECT para credenciales institucionales STU BUAP.
  */
 internal object ValidadorCredenciales {
@@ -29,6 +37,40 @@ internal object ValidadorCredenciales {
     private val REGEX_SOLO_CEROS = Regex("^0+$")
     private val REGEX_SEIS_DIGITOS = Regex("^\\d{6}$")
     private val REGEX_CONTROL = Regex("[\\r\\n\\u0000]")
+    private val REGEX_ESPACIOS_MULTIPLES = Regex("\\s+")
+    private val REGEX_NOMBRE_PROPIO = Regex("^[\\p{L}]+([ '-][\\p{L}]+)*$")
+
+    fun contieneControl(valor: String): Boolean = REGEX_CONTROL.containsMatchIn(valor)
+
+    /**
+     * Valida y normaliza un campo nominal (nombres o apellidos): obligatorio, 2-50 chars,
+     * solo letras (incluyendo acentos/ñ), espacios simples, guiones o apóstrofos.
+     */
+    fun validarCampoNombre(
+        valor: String,
+        campoError: String,
+        mensajeVacio: String,
+        mensajeLongitud: String,
+        mensajeCaracteres: String
+    ): ResultadoCampoTexto {
+        if (contieneControl(valor)) {
+            return ResultadoCampoTexto.Invalido(
+                campoError,
+                "Entrada con caracteres de control no permitidos"
+            )
+        }
+        val limpio = valor.trim().replace(REGEX_ESPACIOS_MULTIPLES, " ")
+        if (limpio.isEmpty()) {
+            return ResultadoCampoTexto.Invalido(campoError, mensajeVacio)
+        }
+        if (limpio.length !in 2..50) {
+            return ResultadoCampoTexto.Invalido(campoError, mensajeLongitud)
+        }
+        if (!REGEX_NOMBRE_PROPIO.matches(limpio)) {
+            return ResultadoCampoTexto.Invalido(campoError, mensajeCaracteres)
+        }
+        return ResultadoCampoTexto.Valido(limpio)
+    }
 
     /**
      * Valida estrictamente fechas en formato DDMMAA considerando días por mes y años bisiestos.

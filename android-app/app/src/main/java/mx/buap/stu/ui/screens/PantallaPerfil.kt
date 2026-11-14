@@ -2,8 +2,10 @@ package mx.buap.stu.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,10 +35,18 @@ fun PantallaPerfil(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .safeDrawingPadding()
+            .verticalScroll(rememberScrollState())
             .padding(28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Column(
+            modifier = Modifier
+                .widthIn(max = 480.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
         Box(
             modifier = Modifier
                 .size(72.dp)
@@ -55,7 +65,7 @@ fun PantallaPerfil(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Pantalla 2: Datos del Estudiante",
+            text = "Perfil",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = AzulOscuroStu,
@@ -84,6 +94,10 @@ fun PantallaPerfil(
 
                 Text("Pasajes STU Disponibles:", fontSize = 12.sp, color = Color(0xFF64748B))
                 Text("${usuario.pasajesDisponibles} viajes activos", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = AzulStu)
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text("Estado de cuenta:", fontSize = 12.sp, color = Color(0xFF64748B))
+                Text(usuario.estado, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = NegroEtiqueta)
             }
         }
 
@@ -99,10 +113,11 @@ fun PantallaPerfil(
         ) {
             Text("Cerrar sesión", color = Color.White, fontWeight = FontWeight.SemiBold)
         }
+        }
     }
 }
 
-@Preview(name = "Pantalla 2 - Perfil Estudiante", showBackground = true, showSystemUi = true)
+@Preview(name = "Perfil Estudiante", showBackground = true, showSystemUi = true)
 @Composable
 fun VistaPreviaPantallaPerfil() {
     TemaStu {

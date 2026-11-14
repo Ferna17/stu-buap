@@ -33,9 +33,13 @@ class RepositorioUsuarioMemoria(
         padron.add(usuario)
     }
 
-    override fun buscarPorMatricula(matricula: String): UsuarioSTU? =
-        padron.find { it.matricula == matricula }
+    override fun buscarPorMatricula(matricula: String): UsuarioSTU? {
+        val matriculaLimpia = matricula.trim()
+        return padron.find { it.matricula.trim() == matriculaLimpia }
+    }
 
-    override fun buscarPorCorreo(correo: String): UsuarioSTU? =
-        padron.find { it.correo.equals(correo, ignoreCase = true) }
+    override fun buscarPorCorreo(correo: String): UsuarioSTU? {
+        val correoLimpio = correo.trim()
+        return padron.find { it.correo.trim().equals(correoLimpio, ignoreCase = true) }
+    }
 }
