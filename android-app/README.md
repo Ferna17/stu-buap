@@ -51,8 +51,9 @@ android-app/
 │       │       └── AplicacionStuTest.kt       # Pruebas UI Compose (Ingreso, Registro, Flujo B y Perfil)
 │       └── test/
 │           └── java/mx/buap/stu/auth/
-│               ├── ValidadorLoginTest.kt      # 19 pruebas unitarias (PF1 a PF19)
-│               └── ValidadorRegistroTest.kt   # 16 pruebas unitarias (PR1 a PR16)
+│               ├── ValidadorAdversarialTest.kt # 21 pruebas adversariales de robustez y seguridad
+│               ├── ValidadorLoginTest.kt       # 19 pruebas unitarias (PF1 a PF19)
+│               └── ValidadorRegistroTest.kt    # 16 pruebas unitarias (PR1 a PR16)
 ```
 
 ---
@@ -69,7 +70,7 @@ android-app/
 
 ## 🧪 Pruebas Unitarias Automatizadas (JUnit 4 y Jest)
 
-### Android (JUnit 4 — 35 pruebas funcionales: 19 PF + 16 PR)
+### Android (JUnit 4 — 56 pruebas: 19 PF + 16 PR + 21 Adversariales)
 ```powershell
 cd "d:\Ingieneria de software\Ingieneria de software ii\stu-buap\android-app"
 .\gradlew.bat testDebugUnitTest --rerun-tasks
@@ -77,6 +78,9 @@ cd "d:\Ingieneria de software\Ingieneria de software ii\stu-buap\android-app"
 
 Reporte esperado:
 ```text
+ APROBADO  app/src/test/java/mx/buap/stu/auth/ValidadorAdversarialTest.kt
+  21 pruebas adversariales (ADV-PWD, ADV-TYP, ADV-WHT, ADV-INJ, ADV-PBN, ADV-MAT)
+
  APROBADO  app/src/test/java/mx/buap/stu/auth/ValidadorLoginTest.kt
   Módulo de Inicio de Sesión STU Android (HU-01 - BICEP/CORRECT)
   √ PF1 a PF19
@@ -85,7 +89,7 @@ Reporte esperado:
   Módulo de Registro de Nuevo Estudiante STU Android (HU-01.1 - BICEP/CORRECT)
   √ PR1 a PR16
 
-Suites de Prueba: 2 aprobadas, 2 total | Pruebas: 35 aprobadas, 35 total
+Suites de Prueba: 3 aprobadas, 3 total | Pruebas: 56 aprobadas, 56 total
 ```
 
 ### JavaScript / Node.js (Rama `tests` — Jest: 56 pruebas: 19 PF + 16 PR + 21 Adversariales)
