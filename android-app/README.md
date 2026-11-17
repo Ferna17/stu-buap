@@ -62,7 +62,7 @@ android-app/
 1. En **`PantallaIngreso`**, el estudiante puede ir a la pantalla separada de registro de dos maneras:
    - Enlace directo **`"¿No estás registrado? Regístrate"`** debajo del botón **"Inicio"**.
    - Aviso contextual cuando el validador de Login detecta **`PF18: Sin registro previo`** (`"Sin registro previo. No estás registrado, debes registrarte para acceder al STU."`) junto al botón resaltado **`"Registrarse en el padrón STU"`** (precargando correo, matrícula y contraseña en `PantallaRegistro`).
-2. En **`PantallaRegistro`** (`"Registro de usuario"`), se capturan los **5 campos obligatorios** (**`Nombre(s)`**, **`Apellidos`**, `Correo electrónico`, `Matrícula`, `Contraseña DDMMAA`) y se presiona **"Registrarse"** (o **`"¿Ya tienes cuenta? Inicia sesión"`** para volver al Login).
+2. En **`PantallaRegistro`** (`"Registro de usuario"`), se capturan los **5 campos obligatorios** (**`Nombre(s)`**, **`Apellidos`**, `Correo electrónico`, `Matrícula`, `Contraseña de 8 a 20 caracteres sin espacios`) y se presiona **"Registrarse"** (o **`"¿Ya tienes cuenta? Inicia sesión"`** para volver al Login).
 3. Si los datos cumplen formato y no existen duplicados en el padrón (`PR1`, `PR2`, `PR13`), se registra al `UsuarioSTU` con su **nombre completo normalizado**, **`0 viajes activos`** y estado **`ACTIVO`**, retornando automáticamente a **`PantallaIngreso`** con sus credenciales listas y aviso de éxito (**Flujo B**) para ingresar con **"Inicio"** a **`PantallaPerfil`** (`"Perfil"`).
 
 ---
@@ -148,8 +148,8 @@ Debe listar tu dispositivo en estado `device`.
 - **Usuario precargado (Login / prueba de duplicados PR10–PR11):**
   - **Correo:** `Javier.sangines@alumno.buap.mx` (o `Javier.sangines@correo.buap.mx`)
   - **Matrícula:** `202268046`
-  - **Contraseña (DDMMAA):** `290504`
+  - **Contraseña (8–20 caracteres sin espacios):** `StuBuap2026`
 - **Usuario nuevo válido (Registro PR1):**
   - **Correo:** `fernando.hernandez@alumno.buap.mx`
   - **Matrícula:** `202112345`
-  - **Contraseña (DDMMAA):** `170301`
+  - **Contraseña (8–20 caracteres sin espacios):** `Fernando2026`

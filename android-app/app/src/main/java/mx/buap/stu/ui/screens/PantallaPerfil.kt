@@ -125,7 +125,7 @@ fun VistaPreviaPantallaPerfil() {
             usuario = UsuarioSTU(
                 correo = "Javier.sangines@alumno.buap.mx",
                 matricula = "202268046",
-                contrasena = "290504",
+                contrasena = "StuBuap2026",
                 nombre = "Javier Sanginés",
                 pasajesDisponibles = 10
             ),

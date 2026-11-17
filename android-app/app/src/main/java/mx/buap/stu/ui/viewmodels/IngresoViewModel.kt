@@ -88,7 +88,7 @@ class IngresoViewModel(
             ValidadorLogin.validarLogin(
                 correo = correo.trim(),
                 matricula = matricula.trim(),
-                contrasena = contrasena.trim(),
+                contrasena = contrasena,
                 baseDeDatos = repositorio.obtenerPadron()
             )
         }

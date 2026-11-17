@@ -90,9 +90,9 @@ class AplicacionStuTest {
         composeTestRule.onNodeWithText("Ingresa tu matrícula")
             .performScrollTo()
             .performTextInput("202112345")
-        composeTestRule.onNodeWithText("Ingresa Fecha de Nacimiento a 6 dígitos")
+        composeTestRule.onNodeWithText("Ingresa tu contraseña (8 a 20 caracteres)")
             .performScrollTo()
-            .performTextInput("170301")
+            .performTextInput("Fernando2026")
         composeTestRule.onNodeWithText("Registrarse").performScrollTo().performClick()
 
         composeTestRule.onNodeWithText(
@@ -118,8 +118,8 @@ class AplicacionStuTest {
             .performTextInput("nuevo.alumno@alumno.buap.mx")
         composeTestRule.onNodeWithText("Ingresa tu matrícula")
             .performTextInput("202512345")
-        composeTestRule.onNodeWithText("Ingresa Fecha de Nacimiento a 6 dígitos")
-            .performTextInput("101006")
+        composeTestRule.onNodeWithText("Ingresa tu contraseña (8 a 20 caracteres)")
+            .performTextInput("Alumno2026")
         composeTestRule.onNodeWithText("Inicio").performScrollTo().performClick()
 
         composeTestRule.onNodeWithText("No estás registrado, debes registrarte", substring = true)

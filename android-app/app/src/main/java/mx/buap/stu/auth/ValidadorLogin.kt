@@ -8,7 +8,7 @@ import mx.buap.stu.data.UsuarioSTU
  * Implementa las reglas de negocio evaluadas mediante BICEP y CORRECT (PF1 a PF19):
  * - Correo institucional BUAP: 1 a 30 caracteres antes del @ y dominio autorizado.
  * - Matrícula: exactamente 9 dígitos numéricos.
- * - Contraseña: fecha de nacimiento en formato DDMMAA (6 dígitos numéricos con día y mes válidos).
+ * - Contraseña: de 8 a 20 caracteres sin espacios en blanco.
  * - Verificación de coincidencia en el padrón y detección de usuario sin registro previo.
  */
 object ValidadorLogin {
@@ -16,8 +16,8 @@ object ValidadorLogin {
     val DOMINIOS_BUAP = ValidadorCredenciales.DOMINIOS_BUAP
 
     val PADRON_DEFECTO = listOf(
-        UsuarioSTU("Javier.sangines@alumno.buap.mx", "202268046", "290504"),
-        UsuarioSTU("Javier.sangines@correo.buap.mx", "202268046", "290504")
+        UsuarioSTU("Javier.sangines@alumno.buap.mx", "202268046", "StuBuap2026"),
+        UsuarioSTU("Javier.sangines@correo.buap.mx", "202268046", "StuBuap2026")
     )
 
     fun validarLogin(

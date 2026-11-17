@@ -10,8 +10,8 @@ import org.junit.Test
 import org.junit.runners.MethodSorters
 
 /**
- * Suite Automatizada de las 12 Pruebas Funcionales (PR1 a PR12) para Android (JUnit 4).
- * Módulo de Registro de Nuevo Estudiante STU BUAP (HU-01.1 — Técnicas BICEP y CORRECT, Sprint 2).
+ * Suite Automatizada de las 16 Pruebas Funcionales (PR1 a PR16) para Android (JUnit 4).
+ * Módulo de Registro de Nuevo Estudiante STU BUAP (HU-01.1 — Técnicas BICEP y CORRECT).
  */
 @FixMethodOrder(MethodSorters.JVM)
 class ValidadorRegistroTest {
@@ -20,7 +20,7 @@ class ValidadorRegistroTest {
         UsuarioSTU(
             correo = "Javier.sangines@alumno.buap.mx",
             matricula = "202268046",
-            contrasena = "290504",
+            contrasena = "StuBuap2026",
             pasajesDisponibles = 4
         )
     )
@@ -30,7 +30,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             "fernando.hernandez@alumno.buap.mx",
             "202112345",
-            "170301",
+            "Fernando2026",
             padronExistente
         )
         assertTrue(resultado.ok)
@@ -42,9 +42,9 @@ class ValidadorRegistroTest {
     @Test
     fun `PR2 - Registrar exitosamente a un alumno nuevo con dominio @correo buap mx`() {
         val resultado = ValidadorRegistro.validarRegistro(
-            "fernando.hernandez@correo.buap.mx",
+            "diego.perez@correo.buap.mx",
             "202154321",
-            "170301",
+            "Diego2026",
             padronExistente
         )
         assertTrue(resultado.ok)
@@ -58,7 +58,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             "@alumno.buap.mx",
             "202112345",
-            "170301",
+            "Fernando2026",
             padronExistente
         )
         assertFalse(resultado.ok)
@@ -71,7 +71,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             correo31,
             "202112345",
-            "170301",
+            "Fernando2026",
             padronExistente
         )
         assertFalse(resultado.ok)
@@ -83,7 +83,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             "fernando.hernandez@alumno.buap.mx",
             "20211234",
-            "170301",
+            "Fernando2026",
             padronExistente
         )
         assertFalse(resultado.ok)
@@ -91,15 +91,16 @@ class ValidadorRegistroTest {
     }
 
     @Test
-    fun `PR6 - Rechazar registro si la contrasena no tiene 6 digitos (5 digitos)`() {
+    fun `PR6 - Rechazar registro si la contrasena tiene menos de 8 caracteres (7 caracteres)`() {
         val resultado = ValidadorRegistro.validarRegistro(
             "fernando.hernandez@alumno.buap.mx",
             "202112345",
-            "17030",
+            "Fern123",
             padronExistente
         )
         assertFalse(resultado.ok)
         assertEquals("password", resultado.campoError)
+        assertEquals(ValidadorCredenciales.MENSAJE_PASSWORD_INVALIDA, resultado.mensaje)
     }
 
     @Test
@@ -107,7 +108,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             "fernando.hernandez@gmail.com",
             "202112345",
-            "170301",
+            "Fernando2026",
             padronExistente
         )
         assertFalse(resultado.ok)
@@ -119,7 +120,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             "fernando.hernandez@alumno.buap.mx",
             "20211234A",
-            "170301",
+            "Fernando2026",
             padronExistente
         )
         assertFalse(resultado.ok)
@@ -127,15 +128,26 @@ class ValidadorRegistroTest {
     }
 
     @Test
-    fun `PR9 - Rechazar registro cuando la contrasena no es una fecha valida (999999)`() {
-        val resultado = ValidadorRegistro.validarRegistro(
+    fun `PR9 - Rechazar registro si la contrasena supera 20 caracteres o contiene espacios`() {
+        val resultadoExceso = ValidadorRegistro.validarRegistro(
             "fernando.hernandez@alumno.buap.mx",
             "202112345",
-            "999999",
+            "FernandoBuap2026Clave",
             padronExistente
         )
-        assertFalse(resultado.ok)
-        assertEquals("password", resultado.campoError)
+        assertFalse(resultadoExceso.ok)
+        assertEquals("password", resultadoExceso.campoError)
+        assertEquals(ValidadorCredenciales.MENSAJE_PASSWORD_INVALIDA, resultadoExceso.mensaje)
+
+        val resultadoEspacios = ValidadorRegistro.validarRegistro(
+            "fernando.hernandez@alumno.buap.mx",
+            "202112345",
+            "Fernando 2026",
+            padronExistente
+        )
+        assertFalse(resultadoEspacios.ok)
+        assertEquals("password", resultadoEspacios.campoError)
+        assertEquals(ValidadorCredenciales.MENSAJE_PASSWORD_INVALIDA, resultadoEspacios.mensaje)
     }
 
     @Test
@@ -143,7 +155,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             "nuevo.correo@alumno.buap.mx",
             "202268046",
-            "170301",
+            "Fernando2026",
             padronExistente
         )
         assertFalse(resultado.ok)
@@ -156,7 +168,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             "Javier.sangines@alumno.buap.mx",
             "202599999",
-            "170301",
+            "Fernando2026",
             padronExistente
         )
         assertFalse(resultado.ok)
@@ -181,7 +193,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             correo = "fernando.hernandez@alumno.buap.mx",
             matricula = "202112345",
-            contrasena = "170301",
+            contrasena = "Fernando2026",
             baseDeDatos = padronExistente,
             nombres = "  Fernando Jesús ",
             apellidos = " Hernández   Gorgua "
@@ -197,7 +209,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             correo = "fernando.hernandez@alumno.buap.mx",
             matricula = "202112345",
-            contrasena = "170301",
+            contrasena = "Fernando2026",
             baseDeDatos = padronExistente,
             nombres = "",
             apellidos = "Hernández Gorgua"
@@ -211,7 +223,7 @@ class ValidadorRegistroTest {
         val resultado = ValidadorRegistro.validarRegistro(
             correo = "fernando.hernandez@alumno.buap.mx",
             matricula = "202112345",
-            contrasena = "170301",
+            contrasena = "Fernando2026",
             baseDeDatos = padronExistente,
             nombres = "Fernando Jesús",
             apellidos = "   "
@@ -225,7 +237,7 @@ class ValidadorRegistroTest {
         val resultadoNombreInvalido = ValidadorRegistro.validarRegistro(
             correo = "fernando.hernandez@alumno.buap.mx",
             matricula = "202112345",
-            contrasena = "170301",
+            contrasena = "Fernando2026",
             baseDeDatos = padronExistente,
             nombres = "Fernando123",
             apellidos = "Hernández"
@@ -236,7 +248,7 @@ class ValidadorRegistroTest {
         val resultadoApellidoInvalido = ValidadorRegistro.validarRegistro(
             correo = "fernando.hernandez@alumno.buap.mx",
             matricula = "202112345",
-            contrasena = "170301",
+            contrasena = "Fernando2026",
             baseDeDatos = padronExistente,
             nombres = "Fernando",
             apellidos = "Hernández@99"

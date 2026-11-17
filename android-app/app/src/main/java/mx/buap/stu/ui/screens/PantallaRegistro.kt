@@ -120,14 +120,14 @@ fun PantallaRegistro(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Campo 5: Contraseña (DDMMAA)
+            // Campo 5: Contraseña (8 a 20 caracteres sin espacios)
             CampoFormularioStu(
                 etiqueta = "Contraseña",
                 valor = viewModel.contrasena,
                 alCambiarValor = { viewModel.actualizarContrasena(it) },
-                textoGuia = "Ingresa Fecha de Nacimiento a 6 dígitos",
+                textoGuia = "Ingresa tu contraseña (8 a 20 caracteres)",
                 esError = resultado?.campoError == "password" || resultado?.campoError == "todos",
-                tipoTeclado = KeyboardType.NumberPassword,
+                tipoTeclado = KeyboardType.Password,
                 esContrasena = true,
                 alEnfocar = { viewModel.iniciarTemporizador() }
             )
@@ -211,7 +211,7 @@ fun VistaPreviaPantallaRegistroConDatos() {
         viewModel.precargarDatos(
             correoInicial = "nuevo.alumno@alumno.buap.mx",
             matriculaInicial = "202512345",
-            contrasenaInicial = "101006"
+            contrasenaInicial = "Alumno2026"
         )
         PantallaRegistro(
             viewModel = viewModel,

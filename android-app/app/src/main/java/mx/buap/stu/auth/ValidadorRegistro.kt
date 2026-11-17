@@ -8,7 +8,7 @@ import mx.buap.stu.data.UsuarioSTU
  * Implementa las reglas de negocio evaluadas mediante BICEP y CORRECT (PR1 a PR12):
  * - Correo institucional BUAP: 1 a 30 caracteres antes del @ y dominio autorizado.
  * - Matrícula: exactamente 9 dígitos numéricos.
- * - Contraseña: fecha de nacimiento en formato DDMMAA (6 dígitos numéricos con fecha válida).
+ * - Contraseña: de 8 a 20 caracteres sin espacios en blanco.
  * - Control de no duplicidad de matrícula y correo en el padrón activo.
  * - Alta inicial con saldo de pasajes igual a 0 y estado "ACTIVO".
  */

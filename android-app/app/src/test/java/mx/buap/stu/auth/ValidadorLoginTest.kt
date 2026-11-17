@@ -16,8 +16,8 @@ import org.junit.runners.MethodSorters
 class ValidadorLoginTest {
 
     private val padronUsuarios = listOf(
-        UsuarioSTU("Javier.sangines@alumno.buap.mx", "202268046", "290504"),
-        UsuarioSTU("Javier.sangines@correo.buap.mx", "202268046", "290504")
+        UsuarioSTU("Javier.sangines@alumno.buap.mx", "202268046", "StuBuap2026"),
+        UsuarioSTU("Javier.sangines@correo.buap.mx", "202268046", "StuBuap2026")
     )
 
     @Test
@@ -25,7 +25,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@alumno.buap.mx",
             "202268046",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertTrue(resultado.ok)
@@ -36,7 +36,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@correo.buap.mx",
             "202268046",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertTrue(resultado.ok)
@@ -47,7 +47,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "@alumno.buap.mx",
             "202268046",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -57,12 +57,12 @@ class ValidadorLoginTest {
     @Test
     fun `PF4 - Aceptar longitud minima de 1 caracter antes del arroba`() {
         val padronMinimo = listOf(
-            UsuarioSTU("j@alumno.buap.mx", "202268046", "290504")
+            UsuarioSTU("j@alumno.buap.mx", "202268046", "StuBuap2026")
         )
         val resultado = ValidadorLogin.validarLogin(
             "j@alumno.buap.mx",
             "202268046",
-            "290504",
+            "StuBuap2026",
             padronMinimo
         )
         assertTrue(resultado.ok)
@@ -72,12 +72,12 @@ class ValidadorLoginTest {
     fun `PF5 - Aceptar longitud maxima de 30 caracteres antes del arroba`() {
         val correo30 = "javiersangines1234567890123456@alumno.buap.mx"
         val padronMaximo = listOf(
-            UsuarioSTU(correo30, "202268046", "290504")
+            UsuarioSTU(correo30, "202268046", "StuBuap2026")
         )
         val resultado = ValidadorLogin.validarLogin(
             correo30,
             "202268046",
-            "290504",
+            "StuBuap2026",
             padronMaximo
         )
         assertTrue(resultado.ok)
@@ -89,7 +89,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             correo31,
             "202268046",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -101,7 +101,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@alumno.buap.mx",
             "20226804",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -113,7 +113,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@alumno.buap.mx",
             "2022680460",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -121,27 +121,29 @@ class ValidadorLoginTest {
     }
 
     @Test
-    fun `PF9 - Rechazar contrasena con 5 digitos`() {
+    fun `PF9 - Rechazar contrasena con menos de 8 caracteres (7 caracteres)`() {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@alumno.buap.mx",
             "202268046",
-            "29050",
+            "Stu2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
         assertEquals("password", resultado.campoError)
+        assertEquals(ValidadorCredenciales.MENSAJE_PASSWORD_INVALIDA, resultado.mensaje)
     }
 
     @Test
-    fun `PF10 - Rechazar contrasena con 7 digitos`() {
+    fun `PF10 - Rechazar contrasena con mas de 20 caracteres (21 caracteres)`() {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@alumno.buap.mx",
             "202268046",
-            "2905041",
+            "StuBuap2026Contrasena",
             padronUsuarios
         )
         assertFalse(resultado.ok)
         assertEquals("password", resultado.campoError)
+        assertEquals(ValidadorCredenciales.MENSAJE_PASSWORD_INVALIDA, resultado.mensaje)
     }
 
     @Test
@@ -149,7 +151,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@gmail.com",
             "202268046",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -161,7 +163,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sanginesalumno.buap.mx",
             "202268046",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -173,7 +175,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@alumno.buap.mx",
             "20226804A",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -181,15 +183,16 @@ class ValidadorLoginTest {
     }
 
     @Test
-    fun `PF14 - Rechazar contrasena que no sea fecha valida`() {
+    fun `PF14 - Rechazar contrasena que contenga espacios en blanco`() {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@alumno.buap.mx",
             "202268046",
-            "999999",
+            "Stu Buap 2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
         assertEquals("password", resultado.campoError)
+        assertEquals(ValidadorCredenciales.MENSAJE_PASSWORD_INVALIDA, resultado.mensaje)
     }
 
     @Test
@@ -197,10 +200,11 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@alumno.buap.mx",
             "202268046",
-            "150803",
+            "ClaveErronea99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
+        assertEquals("password", resultado.campoError)
         assertEquals("Contraseña incorrecta", resultado.mensaje)
     }
 
@@ -209,7 +213,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "Javier.sangines@alumno.buap.mx",
             "202299999",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -221,7 +225,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "otro.nombre@alumno.buap.mx",
             "202268046",
-            "290504",
+            "StuBuap2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -233,7 +237,7 @@ class ValidadorLoginTest {
         val resultado = ValidadorLogin.validarLogin(
             "nuevo.alumno@alumno.buap.mx",
             "202512345",
-            "101006",
+            "Alumno2026",
             padronUsuarios
         )
         assertFalse(resultado.ok)

@@ -83,14 +83,14 @@ fun PantallaIngreso(
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // Campo 3: Contraseña (DDMMAA)
+        // Campo 3: Contraseña (8 a 20 caracteres sin espacios)
         CampoFormularioStu(
             etiqueta = "Contraseña",
             valor = viewModel.contrasena,
             alCambiarValor = { viewModel.actualizarContrasena(it) },
-            textoGuia = "Ingresa Fecha de Nacimiento a 6 dígitos",
+            textoGuia = "Ingresa tu contraseña (8 a 20 caracteres)",
             esError = resultado?.campoError == "password" || resultado?.campoError == "todos",
-            tipoTeclado = KeyboardType.NumberPassword,
+            tipoTeclado = KeyboardType.Password,
             esContrasena = true,
             alEnfocar = { viewModel.iniciarTemporizador() }
         )
@@ -249,7 +249,7 @@ fun VistaPreviaPantallaIngresoSinRegistro() {
         val viewModel = IngresoViewModel(repo)
         viewModel.actualizarCorreo("nuevo.alumno@alumno.buap.mx")
         viewModel.actualizarMatricula("202512345")
-        viewModel.actualizarContrasena("101006")
+        viewModel.actualizarContrasena("Alumno2026")
         viewModel.ejecutarLogin {} // Genera el estado de Sin registro previo
         PantallaIngreso(
             viewModel = viewModel,
