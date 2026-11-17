@@ -1,4 +1,4 @@
-const { esFechaNacimientoValida } = require('./loginValidator');
+const { validarContrasena } = require('./loginValidator');
 
 const DOMINIOS_BUAP = ['alumno.buap.mx', 'alm.buap.mx', 'correo.buap.mx'];
 const REGEX_CONTROL = /[\r\n\0]/;
@@ -44,10 +44,9 @@ function validarRegistro(email, matricula, password, baseDeDatos = [], nombres =
     return { ok: false, campoError: campo, mensaje: 'Entrada con caracteres de control no permitidos' };
   }
 
-  // Sanitización contra espacios accidentales iniciales/finales
+  // Sanitización contra espacios accidentales en correo y matrícula; contraseña sin espacios
   const emailLimpio = email.trim();
   const matriculaLimpia = matricula.trim();
-  const passwordLimpia = password.trim();
   let nombreCompletoValidado = null;
 
   if (requiereNombreCompleto) {
@@ -60,7 +59,7 @@ function validarRegistro(email, matricula, password, baseDeDatos = [], nombres =
       apellidosTexto.trim().length === 0 &&
       emailLimpio.length === 0 &&
       matriculaLimpia.length === 0 &&
-      passwordLimpia.length === 0
+      password.trim().length === 0
     ) {
       return {
         ok: false,
@@ -94,7 +93,7 @@ function validarRegistro(email, matricula, password, baseDeDatos = [], nombres =
     nombreCompletoValidado = `${resNombres.valorLimpio} ${resApellidos.valorLimpio}`;
   }
 
-  if (emailLimpio.length === 0 || matriculaLimpia.length === 0 || passwordLimpia.length === 0) {
+  if (emailLimpio.length === 0 || matriculaLimpia.length === 0 || password.trim().length === 0) {
     return {
       ok: false,
       campoError: 'todos',
@@ -143,12 +142,10 @@ function validarRegistro(email, matricula, password, baseDeDatos = [], nombres =
     return { ok: false, campoError: 'matricula', mensaje: 'La matrícula no puede consistir únicamente en ceros' };
   }
 
-  // 4. Validar contraseña: 6 dígitos y fecha de calendario válida (PR6, PR9)
-  if (!/^\d{6}$/.test(passwordLimpia)) {
-    return { ok: false, campoError: 'password', mensaje: 'La contraseña debe contener 6 dígitos (DDMMAA)' };
-  }
-  if (!esFechaNacimientoValida(passwordLimpia)) {
-    return { ok: false, campoError: 'password', mensaje: 'La contraseña no corresponde a una fecha válida' };
+  // 4. Validar contraseña: 8 a 20 caracteres sin espacios en blanco (PR6, PR9)
+  const resPassword = validarContrasena(password);
+  if (!resPassword.ok) {
+    return resPassword;
   }
 
   // 5. Verificar no duplicidad en el padrón tolerante a registros corruptos (PR10, PR11)
@@ -180,7 +177,7 @@ function validarRegistro(email, matricula, password, baseDeDatos = [], nombres =
   const nuevoUsuario = {
     email: emailLimpio,
     matricula: matriculaLimpia,
-    password: passwordLimpia,
+    password,
     ...(nombreCompletoValidado !== null ? { nombre: nombreCompletoValidado } : {}),
     saldoPasajes: 0,
     estado: 'ACTIVO'

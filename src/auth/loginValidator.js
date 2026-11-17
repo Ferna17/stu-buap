@@ -1,26 +1,24 @@
 const DOMINIOS_BUAP = ['alumno.buap.mx', 'alm.buap.mx', 'correo.buap.mx'];
+const LONGITUD_MIN_PASSWORD = 8;
+const LONGITUD_MAX_PASSWORD = 20;
+const MENSAJE_PASSWORD_INVALIDA = 'La contraseña debe tener entre 8 y 20 caracteres sin espacios';
 
 /**
- * Validador estricto de fecha de nacimiento en formato DDMMAA.
- * Evalúa días válidos según el mes (28, 29, 30 o 31) y años bisiestos.
+ * Valida la regla de contraseña personalizada (8 a 20 caracteres sin espacios en blanco).
  */
-function esFechaNacimientoValida(ddmmaa) {
-  if (typeof ddmmaa !== 'string' || !/^\d{6}$/.test(ddmmaa)) {
-    return false;
+function validarContrasena(password) {
+  if (typeof password !== 'string') {
+    return { ok: false, campoError: 'password', mensaje: MENSAJE_PASSWORD_INVALIDA };
   }
-  const dia = parseInt(ddmmaa.slice(0, 2), 10);
-  const mes = parseInt(ddmmaa.slice(2, 4), 10);
-  const aa = parseInt(ddmmaa.slice(4, 6), 10);
-
-  if (mes < 1 || mes > 12 || dia < 1) {
-    return false;
+  if (
+    password.includes(' ') ||
+    /\s/.test(password) ||
+    password.length < LONGITUD_MIN_PASSWORD ||
+    password.length > LONGITUD_MAX_PASSWORD
+  ) {
+    return { ok: false, campoError: 'password', mensaje: MENSAJE_PASSWORD_INVALIDA };
   }
-
-  const diasPorMes = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  const esBisiesto = (aa % 4 === 0);
-  const maxDias = (mes === 2 && esBisiesto) ? 29 : diasPorMes[mes];
-
-  return dia <= maxDias;
+  return { ok: true };
 }
 
 function validarLogin(email, matricula, password, baseDeDatos = []) {
@@ -31,16 +29,15 @@ function validarLogin(email, matricula, password, baseDeDatos = []) {
 
   // Rechazar inyecciones de caracteres de control (CRLF, saltos de línea, null bytes)
   if (/[\r\n\0]/.test(email) || /[\r\n\0]/.test(matricula) || /[\r\n\0]/.test(password)) {
-    const campo = /[\r\n\0]/.test(matricula) ? 'matricula' : (/[ \r\n\0]/.test(email) ? 'email' : 'password');
+    const campo = /[\r\n\0]/.test(matricula) ? 'matricula' : (/[\r\n\0]/.test(email) ? 'email' : 'password');
     return { ok: false, campoError: campo, mensaje: 'Entrada con caracteres de control no permitidos' };
   }
 
-  // Sanitización contra espacios accidentales iniciales/finales
+  // Sanitización de correo y matrícula contra espacios accidentales; la contraseña no admite espacios
   const emailLimpio = email.trim();
   const matriculaLimpia = matricula.trim();
-  const passwordLimpia = password.trim();
 
-  if (emailLimpio.length === 0 || matriculaLimpia.length === 0 || passwordLimpia.length === 0) {
+  if (emailLimpio.length === 0 || matriculaLimpia.length === 0 || password.trim().length === 0) {
     return { ok: false, campoError: 'todos', mensaje: 'Completa tu correo, matrícula y contraseña para entrar' };
   }
 
@@ -83,13 +80,10 @@ function validarLogin(email, matricula, password, baseDeDatos = []) {
     return { ok: false, campoError: 'matricula', mensaje: 'La matrícula no puede consistir únicamente en ceros' };
   }
 
-  // 4. Contraseña: 6 dígitos y fecha de calendario válida
-  if (!/^\d{6}$/.test(passwordLimpia)) {
-    return { ok: false, campoError: 'password', mensaje: 'La contraseña debe contener 6 dígitos (DDMMAA)' };
-  }
-
-  if (!esFechaNacimientoValida(passwordLimpia)) {
-    return { ok: false, campoError: 'password', mensaje: 'La contraseña no corresponde a una fecha válida' };
+  // 4. Contraseña: 8 a 20 caracteres sin espacios en blanco
+  const resPassword = validarContrasena(password);
+  if (!resPassword.ok) {
+    return resPassword;
   }
 
   // 5. Búsqueda segura en padrón (tolerante a registros corruptos en baseDeDatos)
@@ -117,12 +111,18 @@ function validarLogin(email, matricula, password, baseDeDatos = []) {
     return { ok: false, campoError: 'matricula', mensaje: 'La matrícula no coincide' };
   }
 
-  const uPassword = typeof usuarioEncontrado.password === 'string' ? usuarioEncontrado.password.trim() : usuarioEncontrado.password;
-  if (uPassword !== passwordLimpia) {
+  const uPassword = typeof usuarioEncontrado.password === 'string' ? usuarioEncontrado.password : '';
+  if (uPassword !== password) {
     return { ok: false, campoError: 'password', mensaje: 'Contraseña incorrecta' };
   }
 
   return { ok: true, usuario: usuarioEncontrado };
 }
 
-module.exports = { validarLogin, esFechaNacimientoValida };
+module.exports = {
+  validarLogin,
+  validarContrasena,
+  LONGITUD_MIN_PASSWORD,
+  LONGITUD_MAX_PASSWORD,
+  MENSAJE_PASSWORD_INVALIDA
+};
