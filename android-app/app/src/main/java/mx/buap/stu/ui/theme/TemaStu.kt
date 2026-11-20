@@ -20,6 +20,14 @@ val FondoErrorSuave = Color(0xFFFFF5F5)
 val BordeErrorSuave = Color(0xFFFCA5A5)
 val GrisTextoSecundario = Color(0xFF64748B)
 val GrisTextoSubtitulo = Color(0xFF475569)
+val AzulBuapAsiento = Color(0xFF003B5C)
+val BordeAzulBuapAsiento = Color(0xFF0284C7)
+val FondoAsientoDisponible = Color(0xFFF1F5F9)
+val BordeAsientoDisponible = Color(0xFF86EFAC)
+val FondoAsientoOcupado = Color(0xFFFEE2E2)
+val BordeAsientoOcupado = Color(0xFFDC2626)
+val FondoEstadoProximo = Color(0xFFFEF3C7)
+val TextoEstadoProximo = Color(0xFF92400E)
 
 @Composable
 fun TemaStu(content: @Composable () -> Unit) {

@@ -171,15 +171,10 @@ fun PantallaInicioStu(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 3. Rutas y salidas (HU-02 CA-2 y HU-06 CA-4: estilo activo siempre habilitado; si saldo == 0 abre aviso con recarga directa)
+            // 3. Rutas y salidas (HU-06 CA-01: consulta libre de rutas, horarios y mapa aun con saldo 0)
             BotonAccesoSecundarioStu(
                 texto = "Rutas y salidas",
-                onClick = {
-                    val seleccion = viewModel.intentarSeleccionarSalida()
-                    if (seleccion?.permitido == true) {
-                        onIrARutas()
-                    }
-                }
+                onClick = onIrARutas
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -313,10 +308,10 @@ fun VistaPreviaPantallaInicioConSaldo() {
         val viewModel = InicioViewModel(repo).apply {
             cargarUsuario(
                 UsuarioSTU(
-                    correo = "Javier.sangines@alumno.buap.mx",
-                    matricula = "202268046",
-                    contrasena = "StuBuap2026",
-                    nombre = "Javier Sanginés",
+                    correo = "mateo.morales@alumno.buap.mx",
+                    matricula = "202345678",
+                    contrasena = "AccesoStu99",
+                    nombre = "Mateo Morales Vega",
                     pasajesDisponibles = 10,
                     estado = "ACTIVO"
                 )
@@ -334,10 +329,10 @@ fun VistaPreviaPantallaInicioUnViaje() {
         val viewModel = InicioViewModel(repo).apply {
             cargarUsuario(
                 UsuarioSTU(
-                    correo = "Javier.sangines@alumno.buap.mx",
-                    matricula = "202268046",
-                    contrasena = "StuBuap2026",
-                    nombre = "Javier Sanginés",
+                    correo = "mateo.morales@alumno.buap.mx",
+                    matricula = "202345678",
+                    contrasena = "AccesoStu99",
+                    nombre = "Mateo Morales Vega",
                     pasajesDisponibles = 1,
                     estado = "ACTIVO"
                 )
@@ -355,10 +350,10 @@ fun VistaPreviaPantallaInicioSinSaldo() {
         val viewModel = InicioViewModel(repo).apply {
             cargarUsuario(
                 UsuarioSTU(
-                    correo = "fernando.hernandez@alumno.buap.mx",
-                    matricula = "202112345",
-                    contrasena = "Fernando2026",
-                    nombre = "Fernando Jesús Hernández Gorgua",
+                    correo = "valeria.soto@alumno.buap.mx",
+                    matricula = "202456789",
+                    contrasena = "ValeriaStu88",
+                    nombre = "Valeria Soto Paredes",
                     pasajesDisponibles = 0,
                     estado = "ACTIVO"
                 )

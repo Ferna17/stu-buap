@@ -22,10 +22,10 @@ class EvaluadorSaldoTest {
     @Test
     fun `PS1 - Mostrar saldo positivo y habilitar seleccion de salida con 10 pasajes`() {
         val usuario = UsuarioSTU(
-            correo = "Javier.sangines@alumno.buap.mx",
-            matricula = "202268046",
-            contrasena = "StuBuap2026",
-            nombre = "Javier Sanginés",
+            correo = "mateo.morales@alumno.buap.mx",
+            matricula = "202345678",
+            contrasena = "AccesoStu99",
+            nombre = "Mateo Morales Vega",
             pasajesDisponibles = 10,
             estado = "ACTIVO"
         )
@@ -44,9 +44,9 @@ class EvaluadorSaldoTest {
     @Test
     fun `PS2 - Validar limite minimo valido de 1 pasaje en singular y permitir seleccion de salida`() {
         val usuario = UsuarioSTU(
-            correo = "Javier.sangines@alumno.buap.mx",
-            matricula = "202268046",
-            contrasena = "StuBuap2026",
+            correo = "mateo.morales@alumno.buap.mx",
+            matricula = "202345678",
+            contrasena = "AccesoStu99",
             pasajesDisponibles = 1
         )
 
@@ -94,7 +94,7 @@ class EvaluadorSaldoTest {
         val usuarioCorrupto = UsuarioSTU(
             correo = "anomalo@alumno.buap.mx",
             matricula = "202299999",
-            contrasena = "StuBuap2026",
+            contrasena = "AccesoStu99",
             pasajesDisponibles = -3
         )
 
@@ -120,11 +120,11 @@ class EvaluadorSaldoTest {
     @Test
     fun `PS5 - Integracion entre ValidadorRegistro y EvaluadorSaldo con saldo inicial 0 y redireccion a recarga`() {
         val resultadoRegistro = ValidadorRegistro.validarRegistro(
-            correo = "fernando.hernandez@alumno.buap.mx",
-            matricula = "202112345",
-            contrasena = "Fernando2026",
-            nombres = "Fernando Jesús",
-            apellidos = "Hernández Gorgua"
+            correo = "valeria.soto@alumno.buap.mx",
+            matricula = "202456789",
+            contrasena = "ValeriaStu88",
+            nombres = "Valeria",
+            apellidos = "Soto Paredes"
         )
         assertTrue(resultadoRegistro.ok)
         assertNotNull(resultadoRegistro.usuario)
@@ -150,9 +150,9 @@ class EvaluadorSaldoTest {
         val repo = RepositorioUsuarioMemoria()
         val viewModel = InicioViewModel(repo)
 
-        val estadoConSaldo = viewModel.recargarSaldoDesdeRepositorio("202268046")
+        val estadoConSaldo = viewModel.recargarSaldoDesdeRepositorio("202345678")
         assertNotNull(viewModel.usuarioActual)
-        assertEquals("202268046", viewModel.usuarioActual?.matricula)
+        assertEquals("202345678", viewModel.usuarioActual?.matricula)
         assertNotNull(estadoConSaldo)
         assertEquals(10, viewModel.estadoSaldo?.pasajesDisponibles)
         assertEquals("10 viajes disponibles", viewModel.estadoSaldo?.etiquetaSaldo)

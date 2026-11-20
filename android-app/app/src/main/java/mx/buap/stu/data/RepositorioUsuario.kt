@@ -20,8 +20,8 @@ class RepositorioUsuarioMemoria(
 
     companion object {
         val PADRON_PREDETERMINADO = listOf(
-            UsuarioSTU("Javier.sangines@alumno.buap.mx", "202268046", "StuBuap2026"),
-            UsuarioSTU("Javier.sangines@correo.buap.mx", "202268046", "StuBuap2026")
+            UsuarioSTU("mateo.morales@alumno.buap.mx", "202345678", "AccesoStu99"),
+            UsuarioSTU("mateo.morales@correo.buap.mx", "202345678", "AccesoStu99")
         )
     }
 

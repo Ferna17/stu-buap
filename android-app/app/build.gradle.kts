@@ -43,7 +43,7 @@ android {
                     resultado: org.gradle.api.tasks.testing.TestResult
                 ) {
                     val duracionMs = (resultado.endTime - resultado.startTime).coerceAtLeast(1)
-                    val numeroCaso = Regex("^P[FRS](\\d+)").find(descriptorPrueba.name)?.groupValues?.get(1)?.toIntOrNull() ?: 99
+                    val numeroCaso = Regex("^(?:PRU|P[FRS])(\\d+)").find(descriptorPrueba.name)?.groupValues?.get(1)?.toIntOrNull() ?: 99
                     val linea = "  √ ${descriptorPrueba.name} (${duracionMs} ms)"
                     val clase = descriptorPrueba.className ?: "SuiteDesconocida"
                     resultadosPorClase.getOrPut(clase) { mutableListOf() }.add(numeroCaso to linea)
@@ -62,6 +62,8 @@ android {
                                 "Pruebas Adversariales de Robustez y Seguridad STU Android (BICEP/CORRECT)"
                             clase.endsWith("EvaluadorSaldoTest") ->
                                 "Módulo de Consulta de Saldo y Pantalla Principal STU Android (HU-02 - BICEP/CORRECT)"
+                            clase.endsWith("GestorSalidasTest") ->
+                                "Módulo de Consulta de Rutas, Horarios y Mapa de 36 Asientos STU Android (HU-06 - BICEP/CORRECT)"
                             else ->
                                 "Módulo de Inicio de Sesión STU Android (HU-01 - BICEP/CORRECT)"
                         }

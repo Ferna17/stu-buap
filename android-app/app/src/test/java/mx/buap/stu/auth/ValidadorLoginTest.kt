@@ -16,16 +16,16 @@ import org.junit.runners.MethodSorters
 class ValidadorLoginTest {
 
     private val padronUsuarios = listOf(
-        UsuarioSTU("Javier.sangines@alumno.buap.mx", "202268046", "StuBuap2026"),
-        UsuarioSTU("Javier.sangines@correo.buap.mx", "202268046", "StuBuap2026")
+        UsuarioSTU("mateo.morales@alumno.buap.mx", "202345678", "AccesoStu99"),
+        UsuarioSTU("mateo.morales@correo.buap.mx", "202345678", "AccesoStu99")
     )
 
     @Test
     fun `PF1 - Validar inicio de sesion con credenciales validas (@alumno buap mx)`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@alumno.buap.mx",
-            "202268046",
-            "StuBuap2026",
+            "mateo.morales@alumno.buap.mx",
+            "202345678",
+            "AccesoStu99",
             padronUsuarios
         )
         assertTrue(resultado.ok)
@@ -34,9 +34,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF2 - Validar inicio de sesion con credenciales validas (@correo buap mx)`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@correo.buap.mx",
-            "202268046",
-            "StuBuap2026",
+            "mateo.morales@correo.buap.mx",
+            "202345678",
+            "AccesoStu99",
             padronUsuarios
         )
         assertTrue(resultado.ok)
@@ -46,8 +46,8 @@ class ValidadorLoginTest {
     fun `PF3 - Rechazar si el email tiene 0 caracteres antes del arroba`() {
         val resultado = ValidadorLogin.validarLogin(
             "@alumno.buap.mx",
-            "202268046",
-            "StuBuap2026",
+            "202345678",
+            "AccesoStu99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -57,12 +57,12 @@ class ValidadorLoginTest {
     @Test
     fun `PF4 - Aceptar longitud minima de 1 caracter antes del arroba`() {
         val padronMinimo = listOf(
-            UsuarioSTU("j@alumno.buap.mx", "202268046", "StuBuap2026")
+            UsuarioSTU("m@alumno.buap.mx", "202345678", "AccesoStu99")
         )
         val resultado = ValidadorLogin.validarLogin(
-            "j@alumno.buap.mx",
-            "202268046",
-            "StuBuap2026",
+            "m@alumno.buap.mx",
+            "202345678",
+            "AccesoStu99",
             padronMinimo
         )
         assertTrue(resultado.ok)
@@ -70,14 +70,14 @@ class ValidadorLoginTest {
 
     @Test
     fun `PF5 - Aceptar longitud maxima de 30 caracteres antes del arroba`() {
-        val correo30 = "javiersangines1234567890123456@alumno.buap.mx"
+        val correo30 = "mateomorales123456789012345678@alumno.buap.mx"
         val padronMaximo = listOf(
-            UsuarioSTU(correo30, "202268046", "StuBuap2026")
+            UsuarioSTU(correo30, "202345678", "AccesoStu99")
         )
         val resultado = ValidadorLogin.validarLogin(
             correo30,
-            "202268046",
-            "StuBuap2026",
+            "202345678",
+            "AccesoStu99",
             padronMaximo
         )
         assertTrue(resultado.ok)
@@ -85,11 +85,11 @@ class ValidadorLoginTest {
 
     @Test
     fun `PF6 - Rechazar si el email supera 30 caracteres antes del arroba`() {
-        val correo31 = "javiersangines12345678901234567@alumno.buap.mx"
+        val correo31 = "mateomorales1234567890123456789@alumno.buap.mx"
         val resultado = ValidadorLogin.validarLogin(
             correo31,
-            "202268046",
-            "StuBuap2026",
+            "202345678",
+            "AccesoStu99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -99,9 +99,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF7 - Rechazar matricula con 8 digitos`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@alumno.buap.mx",
-            "20226804",
-            "StuBuap2026",
+            "mateo.morales@alumno.buap.mx",
+            "20234567",
+            "AccesoStu99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -111,9 +111,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF8 - Rechazar matricula con 10 digitos`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@alumno.buap.mx",
-            "2022680460",
-            "StuBuap2026",
+            "mateo.morales@alumno.buap.mx",
+            "2023456780",
+            "AccesoStu99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -123,9 +123,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF9 - Rechazar contrasena con menos de 8 caracteres (7 caracteres)`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@alumno.buap.mx",
-            "202268046",
-            "Stu2026",
+            "mateo.morales@alumno.buap.mx",
+            "202345678",
+            "Clave99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -136,9 +136,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF10 - Rechazar contrasena con mas de 20 caracteres (21 caracteres)`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@alumno.buap.mx",
-            "202268046",
-            "StuBuap2026Contrasena",
+            "mateo.morales@alumno.buap.mx",
+            "202345678",
+            "AccesoStu99Contrasena",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -149,9 +149,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF11 - Rechazar dominio externo (@gmail com)`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@gmail.com",
-            "202268046",
-            "StuBuap2026",
+            "mateo.morales@gmail.com",
+            "202345678",
+            "AccesoStu99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -161,9 +161,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF12 - Rechazar correo sin arroba`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sanginesalumno.buap.mx",
-            "202268046",
-            "StuBuap2026",
+            "mateo.moralesalumno.buap.mx",
+            "202345678",
+            "AccesoStu99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -173,9 +173,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF13 - Rechazar matricula con letras`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@alumno.buap.mx",
-            "20226804A",
-            "StuBuap2026",
+            "mateo.morales@alumno.buap.mx",
+            "20234567A",
+            "AccesoStu99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -185,9 +185,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF14 - Rechazar contrasena que contenga espacios en blanco`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@alumno.buap.mx",
-            "202268046",
-            "Stu Buap 2026",
+            "mateo.morales@alumno.buap.mx",
+            "202345678",
+            "Acceso Stu 99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -198,8 +198,8 @@ class ValidadorLoginTest {
     @Test
     fun `PF15 - Rechazar contrasena incorrecta`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@alumno.buap.mx",
-            "202268046",
+            "mateo.morales@alumno.buap.mx",
+            "202345678",
             "ClaveErronea99",
             padronUsuarios
         )
@@ -211,9 +211,9 @@ class ValidadorLoginTest {
     @Test
     fun `PF16 - Rechazar matricula incorrecta`() {
         val resultado = ValidadorLogin.validarLogin(
-            "Javier.sangines@alumno.buap.mx",
-            "202299999",
-            "StuBuap2026",
+            "mateo.morales@alumno.buap.mx",
+            "202399999",
+            "AccesoStu99",
             padronUsuarios
         )
         assertFalse(resultado.ok)
@@ -224,8 +224,8 @@ class ValidadorLoginTest {
     fun `PF17 - Rechazar correo incorrecto`() {
         val resultado = ValidadorLogin.validarLogin(
             "otro.nombre@alumno.buap.mx",
-            "202268046",
-            "StuBuap2026",
+            "202345678",
+            "AccesoStu99",
             padronUsuarios
         )
         assertFalse(resultado.ok)

@@ -16,7 +16,7 @@ import org.junit.runners.MethodSorters
 class ValidadorAdversarialTest {
 
     private val padronBase = listOf(
-        UsuarioSTU("Javier.sangines@alumno.buap.mx", "202268046", "StuBuap2026", "Javier Sanginés", 5, "ACTIVO"),
+        UsuarioSTU("mateo.morales@alumno.buap.mx", "202345678", "AccesoStu99", "Mateo Morales Vega", 5, "ACTIVO"),
         UsuarioSTU("maria.gonzalez@correo.buap.mx", "202112345", "Maria2026!", "María González", 2, "ACTIVO")
     )
 
@@ -25,18 +25,18 @@ class ValidadorAdversarialTest {
     @Test
     fun `ADV-PWD-1 - Aceptar longitud minima exacta de 8 caracteres sin espacios en login y registro`() {
         val padronMinimo = listOf(
-            UsuarioSTU("minimo@alumno.buap.mx", "202412345", "Stu2026!", pasajesDisponibles = 0)
+            UsuarioSTU("minimo@alumno.buap.mx", "202412345", "Clave99!", pasajesDisponibles = 0)
         )
-        val resLogin = ValidadorLogin.validarLogin("minimo@alumno.buap.mx", "202412345", "Stu2026!", padronMinimo)
+        val resLogin = ValidadorLogin.validarLogin("minimo@alumno.buap.mx", "202412345", "Clave99!", padronMinimo)
         assertTrue(resLogin.ok)
 
-        val resReg = ValidadorRegistro.validarRegistro("nuevo.min@alumno.buap.mx", "202499999", "Stu2026!", padronMinimo)
+        val resReg = ValidadorRegistro.validarRegistro("nuevo.min@alumno.buap.mx", "202499999", "Clave99!", padronMinimo)
         assertTrue(resReg.ok)
     }
 
     @Test
     fun `ADV-PWD-2 - Aceptar longitud maxima exacta de 20 caracteres sin espacios en login y registro`() {
-        val clave20 = "StuBuap2026Seguro123"
+        val clave20 = "AccesoStu99Seguro123"
         val padronMax = listOf(
             UsuarioSTU("maximo@alumno.buap.mx", "202412345", clave20, pasajesDisponibles = 0)
         )
@@ -49,8 +49,8 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-PWD-3 - Rechazar 7 caracteres y 21 caracteres en login y registro`() {
-        for (clave in listOf("Stu2026", "StuBuap2026Contrasena")) {
-            val resLogin = ValidadorLogin.validarLogin("Javier.sangines@alumno.buap.mx", "202268046", clave, padronBase)
+        for (clave in listOf("Clave99", "AccesoStu99Contrasena")) {
+            val resLogin = ValidadorLogin.validarLogin("mateo.morales@alumno.buap.mx", "202345678", clave, padronBase)
             assertFalse(resLogin.ok)
             assertEquals("password", resLogin.campoError)
             assertEquals(ValidadorCredenciales.MENSAJE_PASSWORD_INVALIDA, resLogin.mensaje)
@@ -64,8 +64,8 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-PWD-4 - Rechazar espacios iniciales, finales o internos en contrasena en login y registro`() {
-        for (claveConEspacios in listOf(" StuBuap2026", "StuBuap2026 ", "Stu Buap 2026")) {
-            val resLogin = ValidadorLogin.validarLogin("Javier.sangines@alumno.buap.mx", "202268046", claveConEspacios, padronBase)
+        for (claveConEspacios in listOf(" AccesoStu99", "AccesoStu99 ", "Acceso Stu 99")) {
+            val resLogin = ValidadorLogin.validarLogin("mateo.morales@alumno.buap.mx", "202345678", claveConEspacios, padronBase)
             assertFalse(resLogin.ok)
             assertEquals("password", resLogin.campoError)
             assertEquals(ValidadorCredenciales.MENSAJE_PASSWORD_INVALIDA, resLogin.mensaje)
@@ -79,8 +79,8 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-PWD-5 - Rechazar tabuladores o saltos de linea inyectados en contrasena`() {
-        for (claveInsegura in listOf("StuBuap\t2026", "StuBuap\n2026")) {
-            val resLogin = ValidadorLogin.validarLogin("Javier.sangines@alumno.buap.mx", "202268046", claveInsegura, padronBase)
+        for (claveInsegura in listOf("Acceso\tStu99", "Acceso\nStu99")) {
+            val resLogin = ValidadorLogin.validarLogin("mateo.morales@alumno.buap.mx", "202345678", claveInsegura, padronBase)
             assertFalse(resLogin.ok)
             assertEquals("password", resLogin.campoError)
 
@@ -94,22 +94,22 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-TYP-1 - Rechazar valores puramente numericos o booleanos en correo sin excepciones`() {
-        val resLogin = ValidadorLogin.validarLogin("12345", "202268046", "StuBuap2026", padronBase)
+        val resLogin = ValidadorLogin.validarLogin("12345", "202345678", "AccesoStu99", padronBase)
         assertFalse(resLogin.ok)
         assertEquals("email", resLogin.campoError)
 
-        val resReg = ValidadorRegistro.validarRegistro("true", "202511111", "Fernando2026", padronBase)
+        val resReg = ValidadorRegistro.validarRegistro("true", "202511111", "ValeriaStu88", padronBase)
         assertFalse(resReg.ok)
         assertEquals("email", resReg.campoError)
     }
 
     @Test
     fun `ADV-TYP-2 - Rechazar formatos serializados o multiples arrobas en correo`() {
-        val resLogin = ValidadorLogin.validarLogin("a@b@alumno.buap.mx", "202268046", "StuBuap2026", padronBase)
+        val resLogin = ValidadorLogin.validarLogin("a@b@alumno.buap.mx", "202345678", "AccesoStu99", padronBase)
         assertFalse(resLogin.ok)
         assertEquals("email", resLogin.campoError)
 
-        val resReg = ValidadorRegistro.validarRegistro("{\"email\":\"a\"}@alumno.buap.mx", "202511111", "Fernando2026", padronBase)
+        val resReg = ValidadorRegistro.validarRegistro("{\"email\":\"a\"}@alumno.buap.mx", "202511111", "ValeriaStu88", padronBase)
         assertFalse(resReg.ok)
         assertEquals("email", resReg.campoError)
     }
@@ -117,11 +117,11 @@ class ValidadorAdversarialTest {
     @Test
     fun `ADV-TYP-3 - Resistir cadenas gigantes (DoS 10000 chars) sin bloqueos ni excepciones`() {
         val emailGigante = "a".repeat(10000) + "@alumno.buap.mx"
-        val resEmail = ValidadorLogin.validarLogin(emailGigante, "202268046", "StuBuap2026", padronBase)
+        val resEmail = ValidadorLogin.validarLogin(emailGigante, "202345678", "AccesoStu99", padronBase)
         assertFalse(resEmail.ok)
         assertEquals("email", resEmail.campoError)
 
-        val resMat = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "2".repeat(10000), "Fernando2026", padronBase)
+        val resMat = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "2".repeat(10000), "ValeriaStu88", padronBase)
         assertFalse(resMat.ok)
         assertEquals("matricula", resMat.campoError)
 
@@ -132,7 +132,7 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-TYP-4 - Rechazar campos compuestos unicamente por espacios o tabuladores`() {
-        val resLogin = ValidadorLogin.validarLogin("Javier.sangines@alumno.buap.mx", "202268046", "   \t  ", padronBase)
+        val resLogin = ValidadorLogin.validarLogin("mateo.morales@alumno.buap.mx", "202345678", "   \t  ", padronBase)
         assertFalse(resLogin.ok)
         assertEquals("todos", resLogin.campoError)
 
@@ -143,11 +143,11 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-TYP-5 - Soportar baseDeDatos vacia sin lanzar excepciones en login y registro`() {
-        val resLogin = ValidadorLogin.validarLogin("Javier.sangines@alumno.buap.mx", "202268046", "StuBuap2026", emptyList())
+        val resLogin = ValidadorLogin.validarLogin("mateo.morales@alumno.buap.mx", "202345678", "AccesoStu99", emptyList())
         assertFalse(resLogin.ok)
         assertTrue(resLogin.puedeRegistrarse)
 
-        val resReg = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "202511111", "Fernando2026", emptyList())
+        val resReg = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "202511111", "ValeriaStu88", emptyList())
         assertTrue(resReg.ok)
     }
 
@@ -155,7 +155,7 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-WHT-1 - Espacios iniciales o finales NO deben evadir verificacion de duplicidad en registro`() {
-        val resReg = ValidadorRegistro.validarRegistro("  Javier.sangines@alumno.buap.mx  ", "202599999", "Fernando2026", padronBase)
+        val resReg = ValidadorRegistro.validarRegistro("  mateo.morales@alumno.buap.mx  ", "202599999", "ValeriaStu88", padronBase)
         assertFalse(resReg.ok)
         assertEquals("email", resReg.campoError)
         assertEquals("El correo institucional ya está registrado", resReg.mensaje)
@@ -163,7 +163,7 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-WHT-2 - Matricula con espacios alrededor debe ser sanitizada y no evadir duplicidad en registro`() {
-        val resReg = ValidadorRegistro.validarRegistro("alumno.nuevo@alumno.buap.mx", "  202268046  ", "Fernando2026", padronBase)
+        val resReg = ValidadorRegistro.validarRegistro("alumno.nuevo@alumno.buap.mx", "  202345678  ", "ValeriaStu88", padronBase)
         assertFalse(resReg.ok)
         assertEquals("matricula", resReg.campoError)
         assertEquals("La matrícula ya cuenta con un registro previo", resReg.mensaje)
@@ -171,17 +171,17 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-WHT-3 - Login con espacios accidentales en correo y matricula debe autenticar con exito`() {
-        val res = ValidadorLogin.validarLogin("  Javier.sangines@alumno.buap.mx  ", "  202268046  ", "StuBuap2026", padronBase)
+        val res = ValidadorLogin.validarLogin("  mateo.morales@alumno.buap.mx  ", "  202345678  ", "AccesoStu99", padronBase)
         assertTrue(res.ok)
     }
 
     @Test
     fun `ADV-WHT-4 - Rechazar espacios internos en el nombre de usuario del correo`() {
-        val resLogin = ValidadorLogin.validarLogin("javier sangines@alumno.buap.mx", "202268046", "StuBuap2026", padronBase)
+        val resLogin = ValidadorLogin.validarLogin("mateo morales@alumno.buap.mx", "202345678", "AccesoStu99", padronBase)
         assertFalse(resLogin.ok)
         assertEquals("email", resLogin.campoError)
 
-        val resReg = ValidadorRegistro.validarRegistro("javier sangines@alumno.buap.mx", "202511111", "Fernando2026", padronBase)
+        val resReg = ValidadorRegistro.validarRegistro("mateo morales@alumno.buap.mx", "202511111", "ValeriaStu88", padronBase)
         assertFalse(resReg.ok)
         assertEquals("email", resReg.campoError)
     }
@@ -191,14 +191,14 @@ class ValidadorAdversarialTest {
     @Test
     fun `ADV-INJ-1 - Rechazar inyeccion XSS en email y nombre`() {
         val xssEmail = "<script>alert(1)</script>@alumno.buap.mx"
-        val resLogin = ValidadorLogin.validarLogin(xssEmail, "202268046", "StuBuap2026", padronBase)
+        val resLogin = ValidadorLogin.validarLogin(xssEmail, "202345678", "AccesoStu99", padronBase)
         assertFalse(resLogin.ok)
         assertEquals("email", resLogin.campoError)
 
         val resReg = ValidadorRegistro.validarRegistro(
             "nuevo@alumno.buap.mx",
             "202511111",
-            "Fernando2026",
+            "ValeriaStu88",
             padronBase,
             nombres = "<script>alert(1)</script>",
             apellidos = "Pérez"
@@ -210,11 +210,11 @@ class ValidadorAdversarialTest {
     @Test
     fun `ADV-INJ-2 - Rechazar inyeccion SQL (' OR 1=1 --) en email`() {
         val sqliEmail = "' OR 1=1 --@alumno.buap.mx"
-        val resLogin = ValidadorLogin.validarLogin(sqliEmail, "202268046", "StuBuap2026", padronBase)
+        val resLogin = ValidadorLogin.validarLogin(sqliEmail, "202345678", "AccesoStu99", padronBase)
         assertFalse(resLogin.ok)
         assertEquals("email", resLogin.campoError)
 
-        val resReg = ValidadorRegistro.validarRegistro(sqliEmail, "202511111", "Fernando2026", padronBase)
+        val resReg = ValidadorRegistro.validarRegistro(sqliEmail, "202511111", "ValeriaStu88", padronBase)
         assertFalse(resReg.ok)
         assertEquals("email", resReg.campoError)
     }
@@ -222,22 +222,22 @@ class ValidadorAdversarialTest {
     @Test
     fun `ADV-INJ-3 - Rechazar Path Traversal en email`() {
         val pathEmail = "../../etc/passwd@alumno.buap.mx"
-        val resLogin = ValidadorLogin.validarLogin(pathEmail, "202268046", "StuBuap2026", padronBase)
+        val resLogin = ValidadorLogin.validarLogin(pathEmail, "202345678", "AccesoStu99", padronBase)
         assertFalse(resLogin.ok)
         assertEquals("email", resLogin.campoError)
 
-        val resReg = ValidadorRegistro.validarRegistro(pathEmail, "202511111", "Fernando2026", padronBase)
+        val resReg = ValidadorRegistro.validarRegistro(pathEmail, "202511111", "ValeriaStu88", padronBase)
         assertFalse(resReg.ok)
         assertEquals("email", resReg.campoError)
     }
 
     @Test
     fun `ADV-INJ-4 - Rechazar inyeccion de Null Byte en email y contrasena`() {
-        val resEmail = ValidadorLogin.validarLogin("admin\u0000user@alumno.buap.mx", "202268046", "StuBuap2026", padronBase)
+        val resEmail = ValidadorLogin.validarLogin("admin\u0000user@alumno.buap.mx", "202345678", "AccesoStu99", padronBase)
         assertFalse(resEmail.ok)
         assertEquals("email", resEmail.campoError)
 
-        val resPass = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "202511111", "StuBuap\u00002026", padronBase)
+        val resPass = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "202511111", "Acceso\u0000Stu99", padronBase)
         assertFalse(resPass.ok)
         assertEquals("password", resPass.campoError)
     }
@@ -248,12 +248,12 @@ class ValidadorAdversarialTest {
     fun `ADV-PBN-1 - Soportar registros vacios o malformados en el padron sin lanzar excepciones`() {
         val padronCorrupto = listOf(
             UsuarioSTU("", "", ""),
-            UsuarioSTU("Javier.sangines@alumno.buap.mx", "202268046", "StuBuap2026")
+            UsuarioSTU("mateo.morales@alumno.buap.mx", "202345678", "AccesoStu99")
         )
-        val resLogin = ValidadorLogin.validarLogin("Javier.sangines@alumno.buap.mx", "202268046", "StuBuap2026", padronCorrupto)
+        val resLogin = ValidadorLogin.validarLogin("mateo.morales@alumno.buap.mx", "202345678", "AccesoStu99", padronCorrupto)
         assertTrue(resLogin.ok)
 
-        val resReg = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "202511111", "Fernando2026", padronCorrupto)
+        val resReg = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "202511111", "ValeriaStu88", padronCorrupto)
         assertTrue(resReg.ok)
     }
 
@@ -261,22 +261,22 @@ class ValidadorAdversarialTest {
 
     @Test
     fun `ADV-MAT-1 - Rechazar matricula compuesta unicamente por ceros (000000000)`() {
-        val resLogin = ValidadorLogin.validarLogin("Javier.sangines@alumno.buap.mx", "000000000", "StuBuap2026", padronBase)
+        val resLogin = ValidadorLogin.validarLogin("mateo.morales@alumno.buap.mx", "000000000", "AccesoStu99", padronBase)
         assertFalse(resLogin.ok)
         assertEquals("matricula", resLogin.campoError)
 
-        val resReg = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "000000000", "Fernando2026", padronBase)
+        val resReg = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "000000000", "ValeriaStu88", padronBase)
         assertFalse(resReg.ok)
         assertEquals("matricula", resReg.campoError)
     }
 
     @Test
     fun `ADV-MAT-2 - Rechazar matricula con saltos de linea inyectados`() {
-        val resLogin = ValidadorLogin.validarLogin("Javier.sangines@alumno.buap.mx", "202268046\n", "StuBuap2026", padronBase)
+        val resLogin = ValidadorLogin.validarLogin("mateo.morales@alumno.buap.mx", "202345678\n", "AccesoStu99", padronBase)
         assertFalse(resLogin.ok)
         assertEquals("matricula", resLogin.campoError)
 
-        val resReg = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "202268046\n", "Fernando2026", padronBase)
+        val resReg = ValidadorRegistro.validarRegistro("nuevo@alumno.buap.mx", "202345678\n", "ValeriaStu88", padronBase)
         assertFalse(resReg.ok)
         assertEquals("matricula", resReg.campoError)
     }

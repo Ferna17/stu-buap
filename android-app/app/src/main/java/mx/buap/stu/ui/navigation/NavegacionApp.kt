@@ -15,20 +15,25 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import mx.buap.stu.data.RepositorioSalidas
+import mx.buap.stu.data.RepositorioSalidasMemoria
 import mx.buap.stu.data.RepositorioUsuario
 import mx.buap.stu.data.RepositorioUsuarioMemoria
 import mx.buap.stu.ui.screens.PantallaIngreso
 import mx.buap.stu.ui.screens.PantallaInicioStu
 import mx.buap.stu.ui.screens.PantallaRegistro
+import mx.buap.stu.ui.screens.PantallaRutasSalidas
 import mx.buap.stu.ui.theme.TemaStu
 import mx.buap.stu.ui.viewmodels.IngresoViewModel
 import mx.buap.stu.ui.viewmodels.InicioViewModel
 import mx.buap.stu.ui.viewmodels.RegistroViewModel
+import mx.buap.stu.ui.viewmodels.RutasViewModel
 
 object DestinosStu {
     const val INGRESO = "ingreso"
     const val REGISTRO = "registro"
     const val INICIO = "inicio"
+    const val RUTAS = "rutas"
 }
 
 private data class DatosRegistroIniciales(
@@ -39,11 +44,12 @@ private data class DatosRegistroIniciales(
 
 /**
  * Grafo central de navegación con Navigation Compose.
- * Controla el flujo animado entre Ingreso, Registro e Inicio STU con persistencia compartida.
+ * Controla el flujo animado entre Ingreso, Registro, Inicio STU y Rutas y Salidas con persistencia compartida.
  */
 @Composable
 fun NavegacionApp(
-    repositorio: RepositorioUsuario
+    repositorio: RepositorioUsuario,
+    repositorioSalidas: RepositorioSalidas = remember { RepositorioSalidasMemoria() }
 ) {
     val navController = rememberNavController()
     var datosPrecargadosRegistro by remember { mutableStateOf(DatosRegistroIniciales()) }
@@ -205,9 +211,9 @@ fun NavegacionApp(
                     )
                 },
                 onIrARutas = {
-                    inicioViewModel.mostrarAvisoModulo(
-                        "El módulo \"Rutas y salidas\" (consulta de rutas, horarios y selección de salida) se habilitará en el siguiente sprint (HU-06)."
-                    )
+                    navController.navigate(DestinosStu.RUTAS) {
+                        launchSingleTop = true
+                    }
                 },
                 onIrABoletos = {
                     inicioViewModel.mostrarAvisoModulo(
@@ -221,6 +227,54 @@ fun NavegacionApp(
                     }
                 }
             )
+        }
+
+        composable(
+            route = DestinosStu.RUTAS,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(350)
+                ) + fadeIn(animationSpec = tween(350))
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(350)
+                ) + fadeOut(animationSpec = tween(350))
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(350)
+                ) + fadeIn(animationSpec = tween(350))
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(350)
+                ) + fadeOut(animationSpec = tween(350))
+            }
+        ) {
+            val usuarioActual = inicioViewModel.usuarioActual
+            if (usuarioActual != null) {
+                val rutasViewModel: RutasViewModel = viewModel(
+                    factory = RutasViewModel.Factory(repositorioSalidas)
+                )
+                PantallaRutasSalidas(
+                    usuario = usuarioActual,
+                    viewModel = rutasViewModel,
+                    onVolverInicio = {
+                        navController.popBackStack(DestinosStu.INICIO, inclusive = false)
+                    },
+                    onIrARecargar = {
+                        navController.popBackStack(DestinosStu.INICIO, inclusive = false)
+                        inicioViewModel.mostrarAvisoModulo(
+                            "El módulo \"Recargar pasajes\" (SPEI / CoDi) se habilitará en el siguiente sprint (HU-03 / HU-04)."
+                        )
+                    }
+                )
+            }
         }
     }
 }

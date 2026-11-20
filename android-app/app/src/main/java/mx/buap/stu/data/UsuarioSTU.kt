@@ -7,7 +7,7 @@ data class UsuarioSTU(
     val correo: String,
     val matricula: String,
     val contrasena: String,
-    val nombre: String = "Javier Sanginés",
+    val nombre: String = "Mateo Morales Vega",
     val pasajesDisponibles: Int = 10,
     val estado: String = "ACTIVO"
 )
