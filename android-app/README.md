@@ -1,10 +1,11 @@
-# STU BUAP — Aplicación Móvil Android (HU-01 & HU-01.1 / BICEP & CORRECT)
+# STU BUAP — Aplicación Móvil Android (HU-01, HU-01.1 & HU-02 / BICEP & CORRECT)
 
 Proyecto nativo de **Android (Kotlin + Jetpack Compose + JUnit 4)** con arquitectura **MVVM (Model-View-ViewModel)** y **Navigation Compose**, compatible desde **Android 7.0 (API 24)** hasta **Android 17 (API 37)**.
 
-Implementa el subsistema completo de autenticación institucional BUAP en pantallas separadas (`PantallaIngreso`, `PantallaRegistro` y `PantallaPerfil`), compatible con **Android 12, Android 14 y tablet Android 16** (`safeDrawingPadding()` + scroll adaptable):
+Implementa el subsistema de autenticación institucional BUAP y consulta de saldo / pantalla principal (`PantallaIngreso`, `PantallaRegistro` y `PantallaInicioStu`), compatible con **Android 12, Android 14 y tablet Android 16** (`safeDrawingPadding()` + scroll adaptable):
 - **HU-01 (Sprint 1):** Inicio de sesión (`PantallaIngreso`) con validación BICEP/CORRECT (`PF1`–`PF19`).
-- **HU-01.1 (Sprint 2):** Registro de nuevo estudiante (`PantallaRegistro`) con validación BICEP/CORRECT (`PR1`–`PR16`), captura obligatoria de **`Nombre(s)`** y **`Apellidos`** reflejados en `Perfil`, bloqueo de matrícula/correo duplicados y alta con saldo inicial `0` pasajes y estado `ACTIVO`.
+- **HU-01.1 (Sprint 2):** Registro de nuevo estudiante (`PantallaRegistro`) con validación BICEP/CORRECT (`PR1`–`PR16`), captura obligatoria de **`Nombre(s)`** y **`Apellidos`** reflejados en `Inicio STU`, bloqueo de matrícula/correo duplicados y alta con saldo inicial `0` pasajes y estado `ACTIVO`.
+- **HU-02 (Sprint 3):** Pantalla principal (`PantallaInicioStu`), lógica de negocio `EvaluadorSaldo` (`PS1`–`PS6`) y `InicioViewModel`, con menú de 4 accesos (`Recargar pasajes`, `Estado de mis pagos`, `Rutas y salidas`, `Mis boletos`) + `Cerrar sesión` y aviso directo a recarga cuando el saldo es `0`.
 
 ---
 
@@ -17,7 +18,7 @@ android-app/
 ├── gradle/
 │   └── libs.versions.toml                     # Catálogo de dependencias oficiales
 ├── app/
-│   ├── build.gradle.kts                       # Configuración Compose + listener de pruebas PF/PR
+│   ├── build.gradle.kts                       # Configuración Compose + listener de pruebas PF/PR/PS
 │   └── src/
 │       ├── main/
 │       │   ├── AndroidManifest.xml
@@ -26,6 +27,8 @@ android-app/
 │       │       │   ├── ValidadorCredenciales.kt
 │       │       │   ├── ValidadorLogin.kt      # HU-01 (PF1 a PF19)
 │       │       │   └── ValidadorRegistro.kt   # HU-01.1 (PR1 a PR16)
+│       │       ├── saldo/                     # Lógica de dominio de saldo y salidas (HU-02)
+│       │       │   └── EvaluadorSaldo.kt      # Evaluación, sanitización y redirección a recarga
 │       │       ├── data/                      # Modelos y contratos de datos (preparado para Room/SQLite)
 │       │       │   ├── UsuarioSTU.kt
 │       │       │   ├── ResultadoLogin.kt
@@ -33,44 +36,48 @@ android-app/
 │       │       │   └── RepositorioUsuario.kt
 │       │       ├── ui/
 │       │       │   ├── navigation/            # Rutas y control de navegación con NavHost
-│       │       │   │   └── NavegacionApp.kt   # Ingreso <-> Registro -> Ingreso (Flujo B) -> Perfil
+│       │       │   │   └── NavegacionApp.kt   # Ingreso <-> Registro -> Ingreso (Flujo B) -> Inicio STU
 │       │       │   ├── screens/               # Pantallas e interfaces Compose (Figma)
 │       │       │   │   ├── ComponentesAuthStu.kt
 │       │       │   │   ├── PantallaIngreso.kt
 │       │       │   │   ├── PantallaRegistro.kt
-│       │       │   │   └── PantallaPerfil.kt
+│       │       │   │   └── PantallaInicioStu.kt
 │       │       │   ├── viewmodels/            # Lógica de presentación y estado reactivo (MVVM)
 │       │       │   │   ├── MedidorMetricasCaptura.kt
 │       │       │   │   ├── IngresoViewModel.kt
-│       │       │   │   └── RegistroViewModel.kt
+│       │       │   │   ├── RegistroViewModel.kt
+│       │       │   │   └── InicioViewModel.kt
 │       │       │   └── theme/                 # Colores institucionales BUAP y estilos
 │       │       │       └── TemaStu.kt
 │       │       └── MainActivity.kt            # Punto de entrada de la app
 │       ├── androidTest/
 │       │   └── java/mx/buap/stu/
-│       │       └── AplicacionStuTest.kt       # Pruebas UI Compose (Ingreso, Registro, Flujo B y Perfil)
+│       │       └── AplicacionStuTest.kt       # Pruebas UI Compose (Ingreso, Registro, Flujo B e Inicio STU)
 │       └── test/
-│           └── java/mx/buap/stu/auth/
-│               ├── ValidadorAdversarialTest.kt # 21 pruebas adversariales de robustez y seguridad
-│               ├── ValidadorLoginTest.kt       # 19 pruebas unitarias (PF1 a PF19)
-│               └── ValidadorRegistroTest.kt    # 16 pruebas unitarias (PR1 a PR16)
+│           └── java/mx/buap/stu/
+│               ├── auth/
+│               │   ├── ValidadorAdversarialTest.kt # 21 pruebas adversariales de robustez y seguridad
+│               │   ├── ValidadorLoginTest.kt       # 19 pruebas unitarias (PF1 a PF19)
+│               │   └── ValidadorRegistroTest.kt    # 16 pruebas unitarias (PR1 a PR16)
+│               └── saldo/
+│                   └── EvaluadorSaldoTest.kt       # 6 pruebas unitarias (PS1 a PS6)
 ```
 
 ---
 
-## 🧭 Flujo de Registro e Ingreso (Pantallas Separadas HU-01 y HU-01.1)
+## 🧭 Flujo de Registro, Ingreso e Inicio STU (HU-01, HU-01.1 y HU-02)
 
 1. En **`PantallaIngreso`**, el estudiante puede ir a la pantalla separada de registro de dos maneras:
    - Enlace directo **`"¿No estás registrado? Regístrate"`** debajo del botón **"Inicio"**.
    - Aviso contextual cuando el validador de Login detecta **`PF18: Sin registro previo`** (`"Sin registro previo. No estás registrado, debes registrarte para acceder al STU."`) junto al botón resaltado **`"Registrarse en el padrón STU"`** (precargando correo, matrícula y contraseña en `PantallaRegistro`).
 2. En **`PantallaRegistro`** (`"Registro de usuario"`), se capturan los **5 campos obligatorios** (**`Nombre(s)`**, **`Apellidos`**, `Correo electrónico`, `Matrícula`, `Contraseña de 8 a 20 caracteres sin espacios`) y se presiona **"Registrarse"** (o **`"¿Ya tienes cuenta? Inicia sesión"`** para volver al Login).
-3. Si los datos cumplen formato y no existen duplicados en el padrón (`PR1`, `PR2`, `PR13`), se registra al `UsuarioSTU` con su **nombre completo normalizado**, **`0 viajes activos`** y estado **`ACTIVO`**, retornando automáticamente a **`PantallaIngreso`** con sus credenciales listas y aviso de éxito (**Flujo B**) para ingresar con **"Inicio"** a **`PantallaPerfil`** (`"Perfil"`).
+3. Si los datos cumplen formato y no existen duplicados en el padrón (`PR1`, `PR2`, `PR13`), se registra al `UsuarioSTU` con su **nombre completo normalizado**, **`0 viajes disponibles`** y estado **`ACTIVO`**, retornando automáticamente a **`PantallaIngreso`** con sus credenciales listas y aviso de éxito (**Flujo B**) para ingresar con **"Inicio"** a **`PantallaInicioStu`** (`"Inicio STU"`), donde visualiza únicamente su nombre completo y saldo de pasajes junto a los accesos **"Recargar pasajes"**, **"Estado de mis pagos"**, **"Rutas y salidas"** (con aviso directo a recarga cuando el saldo es `0`), **"Mis boletos"** y **"Cerrar sesión"**.
 
 ---
 
 ## 🧪 Pruebas Unitarias Automatizadas (JUnit 4 y Jest)
 
-### Android (JUnit 4 — 56 pruebas: 19 PF + 16 PR + 21 Adversariales)
+### Android (JUnit 4 — 62 pruebas: 19 PF + 16 PR + 21 Adversariales + 6 PS)
 ```powershell
 cd "d:\Ingieneria de software\Ingieneria de software ii\stu-buap\android-app"
 .\gradlew.bat testDebugUnitTest --rerun-tasks
@@ -89,7 +96,11 @@ Reporte esperado:
   Módulo de Registro de Nuevo Estudiante STU Android (HU-01.1 - BICEP/CORRECT)
   √ PR1 a PR16
 
-Suites de Prueba: 3 aprobadas, 3 total | Pruebas: 56 aprobadas, 56 total
+ APROBADO  app/src/test/java/mx/buap/stu/saldo/EvaluadorSaldoTest.kt
+  Módulo de Consulta de Saldo y Pantalla Principal STU Android (HU-02 - BICEP/CORRECT)
+  √ PS1 a PS6
+
+Suites de Prueba: 4 aprobadas, 4 total | Pruebas: 62 aprobadas, 62 total
 ```
 
 ### JavaScript / Node.js (Rama `tests` — Jest: 56 pruebas: 19 PF + 16 PR + 21 Adversariales)

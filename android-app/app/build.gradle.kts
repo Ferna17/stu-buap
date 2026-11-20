@@ -43,7 +43,7 @@ android {
                     resultado: org.gradle.api.tasks.testing.TestResult
                 ) {
                     val duracionMs = (resultado.endTime - resultado.startTime).coerceAtLeast(1)
-                    val numeroCaso = Regex("^P[FR](\\d+)").find(descriptorPrueba.name)?.groupValues?.get(1)?.toIntOrNull() ?: 99
+                    val numeroCaso = Regex("^P[FRS](\\d+)").find(descriptorPrueba.name)?.groupValues?.get(1)?.toIntOrNull() ?: 99
                     val linea = "  √ ${descriptorPrueba.name} (${duracionMs} ms)"
                     val clase = descriptorPrueba.className ?: "SuiteDesconocida"
                     resultadosPorClase.getOrPut(clase) { mutableListOf() }.add(numeroCaso to linea)
@@ -55,10 +55,15 @@ android {
                     val clase = suite.className
                     if (clase != null && resultadosPorClase.containsKey(clase)) {
                         val rutaArchivo = "app/src/test/java/${clase.replace('.', '/')}.kt"
-                        val titulo = if (clase.endsWith("ValidadorRegistroTest")) {
-                            "Módulo de Registro de Nuevo Estudiante STU Android (HU-01.1 - BICEP/CORRECT)"
-                        } else {
-                            "Módulo de Inicio de Sesión STU Android (HU-01 - BICEP/CORRECT)"
+                        val titulo = when {
+                            clase.endsWith("ValidadorRegistroTest") ->
+                                "Módulo de Registro de Nuevo Estudiante STU Android (HU-01.1 - BICEP/CORRECT)"
+                            clase.endsWith("ValidadorAdversarialTest") ->
+                                "Pruebas Adversariales de Robustez y Seguridad STU Android (BICEP/CORRECT)"
+                            clase.endsWith("EvaluadorSaldoTest") ->
+                                "Módulo de Consulta de Saldo y Pantalla Principal STU Android (HU-02 - BICEP/CORRECT)"
+                            else ->
+                                "Módulo de Inicio de Sesión STU Android (HU-01 - BICEP/CORRECT)"
                         }
                         println("\n APROBADO  $rutaArchivo")
                         println("  $titulo")

@@ -2,6 +2,7 @@ package mx.buap.stu
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -100,10 +101,27 @@ class AplicacionStuTest {
         ).performScrollTo().assertIsDisplayed()
         composeTestRule.onNodeWithText("Inicio").performScrollTo().performClick()
 
-        composeTestRule.onNodeWithText("Perfil").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Inicio STU").assertIsDisplayed()
         composeTestRule.onNodeWithText("Fernando Jesús Hernández Gorgua").assertIsDisplayed()
-        composeTestRule.onNodeWithText("0 viajes activos").assertIsDisplayed()
-        composeTestRule.onNodeWithText("ACTIVO").assertIsDisplayed()
+        composeTestRule.onNodeWithText("0 viajes disponibles").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sin pasajes disponibles. Realiza una recarga para viajar")
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("fernando.hernandez@alumno.buap.mx").assertDoesNotExist()
+        composeTestRule.onNodeWithText("202112345").assertDoesNotExist()
+        composeTestRule.onNodeWithText("ACTIVO").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Recargar pasajes").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Estado de mis pagos").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Rutas y salidas").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Mis boletos").performScrollTo().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Cerrar sesión").performScrollTo().assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Rutas y salidas").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Necesitas al menos 1 pasaje disponible para seleccionar una salida")
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag("dialogo_btn_recargar").assertIsDisplayed().performClick()
+        composeTestRule.onNodeWithText(
+            "El módulo \"Recargar pasajes\" (SPEI / CoDi) se habilitará en el siguiente sprint (HU-03 / HU-04)."
+        ).performScrollTo().assertIsDisplayed()
     }
 
     @Test
@@ -143,8 +161,16 @@ class AplicacionStuTest {
         ).performScrollTo().assertIsDisplayed()
         composeTestRule.onNodeWithText("Inicio").performScrollTo().performClick()
 
-        composeTestRule.onNodeWithText("Perfil").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Inicio STU").assertIsDisplayed()
         composeTestRule.onNodeWithText("Ana Sofía Morales López").assertIsDisplayed()
-        composeTestRule.onNodeWithText("0 viajes activos").assertIsDisplayed()
+        composeTestRule.onNodeWithText("0 viajes disponibles").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Sin pasajes disponibles. Realiza una recarga para viajar")
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("nuevo.alumno@alumno.buap.mx").assertDoesNotExist()
+        composeTestRule.onNodeWithText("202512345").assertDoesNotExist()
+        composeTestRule.onNodeWithText("ACTIVO").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Rutas y salidas").performScrollTo().performClick()
+        composeTestRule.onNodeWithText("Necesitas al menos 1 pasaje disponible para seleccionar una salida")
+            .assertIsDisplayed()
     }
 }

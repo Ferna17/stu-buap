@@ -17,18 +17,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import mx.buap.stu.data.RepositorioUsuario
 import mx.buap.stu.data.RepositorioUsuarioMemoria
-import mx.buap.stu.data.UsuarioSTU
 import mx.buap.stu.ui.screens.PantallaIngreso
-import mx.buap.stu.ui.screens.PantallaPerfil
+import mx.buap.stu.ui.screens.PantallaInicioStu
 import mx.buap.stu.ui.screens.PantallaRegistro
 import mx.buap.stu.ui.theme.TemaStu
 import mx.buap.stu.ui.viewmodels.IngresoViewModel
+import mx.buap.stu.ui.viewmodels.InicioViewModel
 import mx.buap.stu.ui.viewmodels.RegistroViewModel
 
 object DestinosStu {
     const val INGRESO = "ingreso"
     const val REGISTRO = "registro"
-    const val PERFIL = "perfil"
+    const val INICIO = "inicio"
 }
 
 private data class DatosRegistroIniciales(
@@ -39,20 +39,22 @@ private data class DatosRegistroIniciales(
 
 /**
  * Grafo central de navegación con Navigation Compose.
- * Controla el flujo animado entre Ingreso, Registro y Perfil con persistencia compartida.
+ * Controla el flujo animado entre Ingreso, Registro e Inicio STU con persistencia compartida.
  */
 @Composable
 fun NavegacionApp(
     repositorio: RepositorioUsuario
 ) {
     val navController = rememberNavController()
-    var usuarioActivo by remember { mutableStateOf<UsuarioSTU?>(null) }
     var datosPrecargadosRegistro by remember { mutableStateOf(DatosRegistroIniciales()) }
 
     // El ViewModel de Ingreso se mantiene a nivel del grafo de navegación
     // para retener el estado al transitar hacia Registro y volver con éxito (Flujo B).
     val ingresoViewModel: IngresoViewModel = viewModel(
         factory = IngresoViewModel.Factory(repositorio)
+    )
+    val inicioViewModel: InicioViewModel = viewModel(
+        factory = InicioViewModel.Factory(repositorio)
     )
 
     NavHost(
@@ -89,8 +91,9 @@ fun NavegacionApp(
             PantallaIngreso(
                 viewModel = ingresoViewModel,
                 onLoginExitoso = { usuario ->
-                    usuarioActivo = usuario
-                    navController.navigate(DestinosStu.PERFIL) {
+                    inicioViewModel.cargarUsuario(usuario)
+                    inicioViewModel.recargarSaldoDesdeRepositorio(usuario.matricula)
+                    navController.navigate(DestinosStu.INICIO) {
                         popUpTo(DestinosStu.INGRESO) { inclusive = true }
                     }
                 },
@@ -175,7 +178,7 @@ fun NavegacionApp(
         }
 
         composable(
-            route = DestinosStu.PERFIL,
+            route = DestinosStu.INICIO,
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Up,
@@ -189,22 +192,40 @@ fun NavegacionApp(
                 ) + fadeOut(animationSpec = tween(350))
             }
         ) {
-            usuarioActivo?.let { usuario ->
-                PantallaPerfil(
-                    usuario = usuario,
-                    onCerrarSesion = {
-                        usuarioActivo = null
-                        navController.navigate(DestinosStu.INGRESO) {
-                            popUpTo(0) { inclusive = true }
-                        }
+            PantallaInicioStu(
+                viewModel = inicioViewModel,
+                onIrARecargar = {
+                    inicioViewModel.mostrarAvisoModulo(
+                        "El módulo \"Recargar pasajes\" (SPEI / CoDi) se habilitará en el siguiente sprint (HU-03 / HU-04)."
+                    )
+                },
+                onIrAEstadoPagos = {
+                    inicioViewModel.mostrarAvisoModulo(
+                        "El módulo \"Estado de mis pagos\" se habilitará en el siguiente sprint (HU-05)."
+                    )
+                },
+                onIrARutas = {
+                    inicioViewModel.mostrarAvisoModulo(
+                        "El módulo \"Rutas y salidas\" (consulta de rutas, horarios y selección de salida) se habilitará en el siguiente sprint (HU-06)."
+                    )
+                },
+                onIrABoletos = {
+                    inicioViewModel.mostrarAvisoModulo(
+                        "El módulo \"Mis boletos\" (QR vigente) se habilitará en el siguiente sprint (HU-07 / HU-09 / HU-10)."
+                    )
+                },
+                onCerrarSesion = {
+                    inicioViewModel.limpiarSesion()
+                    navController.navigate(DestinosStu.INGRESO) {
+                        popUpTo(0) { inclusive = true }
                     }
-                )
-            }
+                }
+            )
         }
     }
 }
 
-@Preview(name = "Flujo Completo Interactivo STU (Login <-> Registro <-> Perfil)", showBackground = true, showSystemUi = true)
+@Preview(name = "Flujo Completo Interactivo STU (Login <-> Registro <-> Inicio)", showBackground = true, showSystemUi = true)
 @Composable
 fun VistaPreviaFlujoCompletoAuth() {
     TemaStu {
